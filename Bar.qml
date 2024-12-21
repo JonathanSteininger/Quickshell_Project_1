@@ -9,17 +9,25 @@ Scope {
     PanelWindow {
         color: "#00000000"
         screen: Quickshell.screens[0]
-        height: 50
+        height: 60
         anchors {
             top: true
             left: true
             right: true
         }
-        Sections.Left{
-        }
-        Sections.Middle{
-        }
-        Sections.Right{
+        Rectangle{
+            color: "transparent";
+            width: parent.width;
+            height: 50;
+            anchors.verticalCenter: parent.verticalCenter;
+
+            
+            Sections.Left{
+            }
+            Sections.Middle{
+            }
+            Sections.Right{
+            }
         }
     }
 }

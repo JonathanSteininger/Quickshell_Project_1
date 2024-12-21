@@ -187,7 +187,6 @@ Canvas{
             childrenShapeCache.push(getChildBounds(i));
         }
         width = calcTotalWidth();
-        console.log(width);
         requestPaint();
     }
     function createShape(
@@ -228,6 +227,9 @@ Canvas{
         _update();
     }
     onChildrenRectChanged: {
+        _update();
+    }
+    onChildrenChanged: {
         _update();
     }
 }
