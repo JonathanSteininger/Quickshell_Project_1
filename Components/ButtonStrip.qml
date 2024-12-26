@@ -91,20 +91,23 @@ Canvas{
             riseRun *= -1;
         }
         var hitboxOffset = _y * riseRun;
+        var tiltOffset = height*tiltStrength/2;
         _x += hitboxOffset;
-
-
+        if (tiltRight){
+            tiltOffset *= -1;
+        }
         for (var i = 1; i < children.length; i++){
             var shift = spacing/2;
             if(i == 1 || i == children.length -1){
                 shift = horizontalPadding;
             }
-            var _left = children[i].x - shift - height*tiltStrength/2;
-            var _right = children[i].x + children[i].width + shift - height*tiltStrength/2;
+            var _left = children[i].x - shift - tiltOffset;
+            var _right = children[i].x + children[i].width + shift - tiltOffset;
             if (_left < _x && _x < _right ){
                 return i;
             }
         }
+
         return -1;
     }
 
