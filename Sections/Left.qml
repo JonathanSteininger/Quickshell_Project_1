@@ -19,19 +19,19 @@ ButtonStrip{
     //property string currentjson: "";
     property list<WorkspaceSection> workspaceSections: [];
     property list<WorkspaceSection> workspaceSectionsGarbage: [];
-    property WorkspaceSection currentlyFocusedWorkspace: undefined;
+    property var currentlyFocusedWorkspace: undefined;
+    //used to generate workspace sections.
     property var componentFactory: Qt.createComponent("../Dynamic/WorkspaceSection.qml");
 
     Text{
         id: timer;
-
         color: Colour.fg;
         width: 120;
         font.family: "Iosevka";
         font.pointSize: 14;
         horizontalAlignment: Text.AlignHCenter;
         signal clicked();
-        onClicked: () => console.log("Open Time panel");
+        onClicked: () => parent.fillWorkspaces();
         Process {
             id: dateProc;
             command: ["date", "+%r"];
@@ -50,7 +50,6 @@ ButtonStrip{
         }
     }
     function manageWorkspaces(event) {
-        console.log(`data: ${event.data}`, `name: ${event.name}`);
         if(event.name == "workspacev2"){
             var data = event.data.split(",");
             updateActiveWorkspace(data[0]);
@@ -58,12 +57,10 @@ ButtonStrip{
             updateActiveWorkspaceProc.running = true;
         }
         if(event.name == "destroyworkspacev2"){
-            console.log("DESTROY", event.data);
             var data = event.data.split(",");
             removeWorkspace(data[0]);
         }
         if(event.name == "createworkspacev2"){
-            console.log("CREATE", event.data);
             var data = event.data.split(",");
             addWorkspace(...data);
         }
@@ -81,9 +78,12 @@ ButtonStrip{
         if(currentlyFocusedWorkspace != undefined){
             currentlyFocusedWorkspace.color = Colour.fg;
         }
-        currentlyFocusedWorkspace = workspaceSections.find((child) => child.wid == id);
-        if(currentlyFocusedWorkspace != undefined){
-            currentlyFocusedWorkspace.color = Colour._active;
+        var temp = workspaceSections.find((child) => child.wid == id);
+        if (temp != undefined){
+            currentlyFocusedWorkspace = temp;
+            if(currentlyFocusedWorkspace != undefined){
+                currentlyFocusedWorkspace.color = Colour._active;
+            }
         }
     }
     function removeWorkspace(workspace_id: int) {
@@ -123,10 +123,20 @@ ButtonStrip{
         onTriggered: updateWorkspaces(true);
     }
     Component.onCompleted: {
-        fillWorkspaces();
         Hyprland.rawEvent.connect(manageWorkspaces);
+        //for some reason I need to delay it. otherwise workspaces read from Hyprland is 0.
+        //fillWorkspaces();
+        workspaceFillTimer.running = true;
+    }
+    Timer{
+        id: workspaceFillTimer;
+        interval: 40;
+        running: false;
+        onTriggered: leftPanel.fillWorkspaces();
+        
     }
     function fillWorkspaces() {
+        Hyprland.refreshWorkspaces();
         var workspaces = Hyprland.workspaces.values;
         //workspaces = workspaces.sort((a,b) => a.id - b.id);
         for (var i = 0; i < workspaces.length; i++){
@@ -140,6 +150,7 @@ ButtonStrip{
         }
         workspaceSections.sort((a,b) => a.wid - b.wid);
         updateWorkspaces(true);
+        updateActiveWorkspaceProc.running = true;
     }
     function sort(workspaces) {
         var output = [];
