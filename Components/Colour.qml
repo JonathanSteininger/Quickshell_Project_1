@@ -12,4 +12,5 @@ Singleton {
     property string fg: "#FFD3B0";
     property string dark: "#0D0F01";
     property string accent: "#872341";
+    property string trans: "#00000000";
 }
