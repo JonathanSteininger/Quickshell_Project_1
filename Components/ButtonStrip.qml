@@ -68,10 +68,16 @@ Canvas{
     function clearHover(){
         hoveredChild = -1;
     }
-    function setHoverIndex(index){
-        if(index >= 0 && index < children.length){
-            hoveredChild = index;
+    function setHoverIndex(index): bool{
+        if(index < 0 || index >= children.length){
+            return false;
         }
+        if (index == hoveredChild){
+            return false;
+        }
+        hoveredChild = index;
+        requestPaint();
+        return true;
     }
 
     function clickButton(_x, _y){
@@ -123,7 +129,6 @@ Canvas{
         }
 
         setHoverIndex(index-1);
-        requestPaint();
     }
 
     onPaint: {
