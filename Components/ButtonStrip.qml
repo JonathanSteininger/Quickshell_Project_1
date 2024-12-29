@@ -97,6 +97,9 @@ Canvas{
             tiltOffset *= -1;
         }
         for (var i = 1; i < children.length; i++){
+            if(children[i].onClicked == undefined){
+                continue;
+            }
             var shift = spacing/2;
             if(i == 1 || i == children.length -1){
                 shift = horizontalPadding;
