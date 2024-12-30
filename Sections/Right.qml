@@ -48,8 +48,6 @@ ButtonStrip{
         font.pointSize: 18;
         horizontalAlignment: Text.AlignHCenter;
         width: 30;
-        signal clicked();
-        onClicked: () => console.log("open brightness");
         onWidthChanged: {
         }
     }

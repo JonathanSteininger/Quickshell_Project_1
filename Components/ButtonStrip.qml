@@ -32,6 +32,72 @@ Canvas{
     property list<var> childrenShapeCache: []; 
     property var hoveredChild: -1;
 
+
+    //ugly shit for transitions
+    property real x1: 0;
+    property real y1: 0;
+
+    property real x2: 0;
+    property real y2: 0;
+
+    property real x3: 0;
+    property real y3: 0;
+
+    property real x4: 0;
+    property real y4: 0;
+
+    function drawHover(ctx, color){
+        ctx.beginPath();
+        ctx.fillStyle = color
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.lineTo(x3,y3);
+        ctx.lineTo(x4,y4);
+        ctx.lineTo(x1,y1);
+        ctx.fill();
+        ctx.closePath();
+    }
+    component MyBehavior: Behavior {
+        property alias prop: anime.property;
+        SequentialAnimation{
+            PropertyAnimation{
+                target: canvas;
+                properties: "animationing";
+                to: true;
+                duration: 0;
+            }
+            NumberAnimation {
+                id: anime;
+                target: canvas;
+                duration: 200;
+                easing.type: Easing.OutExpo;
+            }
+            PropertyAnimation{
+                target: canvas;
+                properties: "animationing";
+                to: false;
+                duration: 200;
+            }
+    }
+    }
+    property bool animationing: false;
+    FrameAnimation{
+        id: thing;
+        running: canvas.animationing;
+        onTriggered: () => {canvas.requestPaint();
+    }
+    }
+    MyBehavior on x1 { prop: "x1" }
+    MyBehavior on y1 { prop: "y1" }
+    MyBehavior on x2 { prop: "x2" }
+    MyBehavior on y2 { prop: "y2" }
+    MyBehavior on x3 { prop: "x3" }
+    MyBehavior on y3 { prop: "y3" }
+    MyBehavior on x4 { prop: "x4" }
+    MyBehavior on y4 { prop: "y4" }
+
+        
+        
     function drawShape(ctx, shape, borderSize:real, color, borderColor){
         ctx.beginPath();
         if(shape.length <= 0){
@@ -66,6 +132,10 @@ Canvas{
         }
     }
     function clearHover(){
+        x3=childrenShapeCache[hoveredChild][1].x;
+        y3=childrenShapeCache[hoveredChild][1].y;
+        x4=childrenShapeCache[hoveredChild][0].x;
+        y4=childrenShapeCache[hoveredChild][0].y;
         hoveredChild = -1;
     }
     function setHoverIndex(index): bool{
@@ -76,6 +146,15 @@ Canvas{
             return false;
         }
         hoveredChild = index;
+        //hoverShape= childrenShapeCache[index];
+        x1=childrenShapeCache[index][0].x;
+        y1=childrenShapeCache[index][0].y;
+        x2=childrenShapeCache[index][1].x;
+        y2=childrenShapeCache[index][1].y;
+        x3=childrenShapeCache[index][2].x;
+        y3=childrenShapeCache[index][2].y;
+        x4=childrenShapeCache[index][3].x;
+        y4=childrenShapeCache[index][3].y;
         requestPaint();
         return true;
     }
@@ -135,8 +214,11 @@ Canvas{
         var ctx = getContext("2d");
         ctx.reset();
         drawShape(ctx, createShape(), borderSize, color, borderColor);
+        drawHover(ctx, borderColor);
+            //drawShape(ctx, hoverShape, borderSize, borderColor, borderColor);
         if (hoveredChild != -1){
-            drawShape(ctx, childrenShapeCache[hoveredChild], borderSize, borderColor, borderColor);
+            //drawShape(ctx, 
+            //drawShape(ctx, childrenShapeCache[hoveredChild], borderSize, borderColor, borderColor);
         }
         for (var i = 0; i < extraShapes.length;i++){
             drawShape(ctx, extraShapes[i], borderSize, borderColor, borderColor);
@@ -195,7 +277,8 @@ Canvas{
             totalOffset+=children[i].width;
             totalOffset+=spacing;
 
-            childrenShapeCache.push(getChildBounds(i));
+            var box = getChildBounds(i);
+            childrenShapeCache.push(box);
         }
         width = calcTotalWidth();
         requestPaint();
@@ -208,18 +291,17 @@ Canvas{
         _margin = this.borderSize,
         _tiltRight = this.tiltRight,
         _tiltStrength = this.tiltStrength
-    ){
-
+    ): list<point>{
         var _shift = height/2 * tiltStrength;
         if (_tiltRight){
             _shift *= -1;
         }
 
         var points = [
-            {x:0,y:0},
-            {x:0,y:0},
-            {x:0,y:0},
-            {x:0,y:0}
+            Qt.point(0,0),
+            Qt.point(0,0),
+            Qt.point(0,0),
+            Qt.point(0,0)
             ];
 
         points[0].x = _x - _shift + _margin;
