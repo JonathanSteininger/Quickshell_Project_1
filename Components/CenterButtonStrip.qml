@@ -34,6 +34,75 @@ Canvas{
     property list<var> childrenShapeCache: []; 
     property var hoveredChild: -1;
 
+    //ugly shit for transitions
+    property real x1: 0;
+    property real y1: 0;
+
+    property real x2: 0;
+    property real y2: 0;
+
+    property real x3: 0;
+    property real y3: 0;
+
+    property real x4: 0;
+    property real y4: 0;
+
+    property bool anyRunning: false;
+
+    function drawHover(ctx, color){
+        ctx.beginPath();
+        ctx.fillStyle = color
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.lineTo(x3,y3);
+        ctx.lineTo(x4,y4);
+        ctx.lineTo(x1,y1);
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    component MyBehavior: Behavior {
+        id: dad;
+        required property string prop;
+        SequentialAnimation{
+            ScriptAction{
+                script: {
+                    animationDelay.restart();
+                    animationDelay.running = true;
+                    canvas.anyRunning = true;
+                }
+            }
+            NumberAnimation {
+                alwaysRunToEnd: true;
+                target: canvas;
+                property: dad.prop;
+                duration: 200;
+                easing.type: Easing.OutExpo;
+            }
+        }
+    }
+    Timer{
+        id: animationDelay;
+        interval: 250;
+        running: false;
+        onTriggered: canvas.anyRunning = false;
+    }
+    FrameAnimation{
+        id: thing;
+        running: canvas.anyRunning;
+        onTriggered: () => {canvas.requestPaint(); }
+    }
+
+    MyBehavior on x1 { prop: "x1" }
+    MyBehavior on y1 { prop: "y1" }
+    MyBehavior on x2 { prop: "x2" }
+    MyBehavior on y2 { prop: "y2" }
+    MyBehavior on x3 { prop: "x3" }
+    MyBehavior on y3 { prop: "y3" }
+    MyBehavior on x4 { prop: "x4" }
+    MyBehavior on y4 { prop: "y4" }
+
+
     function drawShape(ctx, shape, borderSize:real, color, borderColor){
         ctx.beginPath();
         if(shape.length <= 0){
@@ -68,12 +137,31 @@ Canvas{
         }
     }
     function clearHover(){
+        x3=x2;
+        y3=y2;
+        x4=x1;
+        y4=y1;
         hoveredChild = -1;
     }
-    function setHoverIndex(index){
-        if(index >= 0 && index < children.length){
-            hoveredChild = index;
+    function setHoverIndex(index): bool{
+        if(index < 0 || index >= children.length){
+            return false;
         }
+        if (index == hoveredChild){
+            return false;
+        }
+        hoveredChild = index;
+        //hoverShape= childrenShapeCache[index];
+        x1=childrenShapeCache[index][0].x;
+        y1=childrenShapeCache[index][0].y;
+        x2=childrenShapeCache[index][1].x;
+        y2=childrenShapeCache[index][1].y;
+        x3=childrenShapeCache[index][2].x;
+        y3=childrenShapeCache[index][2].y;
+        x4=childrenShapeCache[index][3].x;
+        y4=childrenShapeCache[index][3].y;
+        requestPaint();
+        return true;
     }
 
     function clickButton(_x, _y){
@@ -88,16 +176,17 @@ Canvas{
         //calculates the current offset from the mouse relative to the tilt.
         //can use this value with simple position info to get hovered element.
         //We only have to compute once then.
-        var riseRun = tiltStrength;
-        if (!tiltRight){
+        var riseRun = -tiltStrength;
+        var centerXPos = children[center+1].x + children[center+1].width/2;
+        if(_x > centerXPos){
             riseRun *= -1;
         }
         var hitboxOffset = _y * riseRun;
         var tiltOffset = height*tiltStrength/2;
-        _x += hitboxOffset;
-        if (tiltRight){
+        if(_x > centerXPos){
             tiltOffset *= -1;
         }
+        _x += hitboxOffset;
         for (var i = 1; i < children.length; i++){
             var shift = spacing/2;
             if(i == 1 || i == children.length -1){
@@ -129,9 +218,12 @@ Canvas{
         var ctx = getContext("2d");
         ctx.reset();
         drawShape(ctx, createTrapazoid(), borderSize, color, borderColor);
+        drawHover(ctx, borderColor);
+        /*
         if (hoveredChild != -1){
             drawShape(ctx, childrenShapeCache[hoveredChild], borderSize, borderColor, borderColor);
         }
+        */
         for (var i = 0; i < extraShapes.length;i++){
             drawShape(ctx, extraShapes[i], borderSize, borderColor, borderColor);
         }
