@@ -6,6 +6,8 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQml
 
+pragma ComponentBehavior: Bound;
+
 Canvas{
     id: canvas
     property bool tiltRight: true;
@@ -46,6 +48,8 @@ Canvas{
     property real x4: 0;
     property real y4: 0;
 
+    property bool anyRunning: false;
+
     function drawHover(ctx, color){
         ctx.beginPath();
         ctx.fillStyle = color
@@ -57,35 +61,37 @@ Canvas{
         ctx.fill();
         ctx.closePath();
     }
+
     component MyBehavior: Behavior {
-        property alias prop: anime.property;
+        id: dad;
+        required property string prop;
         SequentialAnimation{
-            PropertyAnimation{
-                target: canvas;
-                properties: "animationing";
-                to: true;
-                duration: 0;
+            ScriptAction{
+                script: {
+                    animationDelay.restart();
+                    animationDelay.running = true;
+                    canvas.anyRunning = true;
+                }
             }
             NumberAnimation {
-                id: anime;
+                alwaysRunToEnd: true;
                 target: canvas;
+                property: dad.prop;
                 duration: 200;
                 easing.type: Easing.OutExpo;
             }
-            PropertyAnimation{
-                target: canvas;
-                properties: "animationing";
-                to: false;
-                duration: 200;
-            }
+        }
     }
+    Timer{
+        id: animationDelay;
+        interval: 250;
+        running: false;
+        onTriggered: canvas.anyRunning = false;
     }
-    property bool animationing: false;
     FrameAnimation{
         id: thing;
-        running: canvas.animationing;
-        onTriggered: () => {canvas.requestPaint();
-    }
+        running: canvas.anyRunning;
+        onTriggered: () => {canvas.requestPaint(); }
     }
     MyBehavior on x1 { prop: "x1" }
     MyBehavior on y1 { prop: "y1" }
@@ -132,10 +138,10 @@ Canvas{
         }
     }
     function clearHover(){
-        x3=childrenShapeCache[hoveredChild][1].x;
-        y3=childrenShapeCache[hoveredChild][1].y;
-        x4=childrenShapeCache[hoveredChild][0].x;
-        y4=childrenShapeCache[hoveredChild][0].y;
+        x3=x2;
+        y3=y2;
+        x4=x1;
+        y4=y1;
         hoveredChild = -1;
     }
     function setHoverIndex(index): bool{
