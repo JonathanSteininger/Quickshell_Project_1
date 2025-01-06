@@ -109,6 +109,8 @@ ButtonStrip{
         color: Colour.fg;
         font.family: "Iosevka";
         font.pointSize: 14;
+        signal clicked();
+        onClicked: () => console.log("hello");
         //onTextChanged: parent._update();
         onTextChanged: () => {
             parent._update();
@@ -127,8 +129,22 @@ ButtonStrip{
             running: false;
             command: ["sh", "-c", `pw-dump ${volume.defaultAudioSink.id} | jq '.[0].info.params.Props.[0].volume | sqrt * 100'`];
             stdout: SplitParser{
-                onRead: (data) => volume.text = `${data}%`;
+                onRead: (data) => volume.text = `${data}% 󰕾`;
+            }//U+1F56
+            stderr: SplitParser{
+                onRead: (data) => {
+                    console.log("volume process failed... or some other error.");
+                    console.log("volume error:", data);
+                    volume.destroy();
+                }
             }
+            onExited: (exitCode, exitStatus) => {
+                if(exitCode != 0){
+                    console.log("error code returned from volume process:", exitCode);
+                    volume.destroy();
+                }
+            }
+            
         }
     }
     Text{
@@ -147,8 +163,25 @@ ButtonStrip{
             id: batteryProc;
             running: true;
             command: ["sh", "-c", `bc <<< "scale=3;$(cat /sys/class/power_supply/BAT0/charge_now )/$(cat /sys/class/power_supply/BAT0/charge_full) * 100" | sed 's/..$//'`];
+
             stdout: SplitParser{
-                onRead: data => battery.text = `${data}%`
+                onRead: (data) => {
+                    battery.text = `${data}%`
+                }
+            }
+            
+            stderr: SplitParser{
+                onRead: (data) => {
+                    console.log("Battery usage process failed. Removing Component because you prob have no battery... or some other error.");
+                    console.log("bat usage error:", data);
+                    battery.destroy();
+                }
+            }
+            onExited: (exitCode, exitStatus) => {
+                if(exitCode != 0){
+                    console.log("error code returned from battery usage process:", exitCode);
+                    battery.destroy();
+                }
             }
         }
         onTextChanged: parent._update();
@@ -168,7 +201,7 @@ ButtonStrip{
         Process{
             id: chargingProc;
             running: true;
-            command: ["acpi"];
+            command: ["sh", "-c", "acpi"];
             stdout: SplitParser{
                 onRead: data => {
                     var _sections = data.split(" ");
@@ -180,6 +213,19 @@ ButtonStrip{
                     }
                     var time = output;
                     charging.text = `${time}`;
+                }
+            }
+            stderr: SplitParser{
+                onRead: (data) => {
+                    console.log("battery remaining failed... or some other error.");
+                    console.log("battery remaining  error:", data);
+                    charging.destroy();
+                }
+            }
+            onExited: (exitCode, exitStatus) => {
+                if(exitCode != 0){
+                    console.log("error code returned from battery remaining process:", exitCode);
+                    charging.destroy();
                 }
             }
         }
