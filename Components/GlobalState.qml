@@ -12,6 +12,7 @@ Singleton {
     }
     property int left: -1;
     property point leftPos: Qt.point(0, 60);
+
     property list<string> leftMap:[
         "audio",
         "time"

@@ -58,7 +58,7 @@ ButtonStrip{
         font.pointSize: 14;
         horizontalAlignment: Text.AlignHCenter;
         signal clicked();
-        onClicked: () => GlobalState.popoutLeft("time", null);
+        onClicked: () => GlobalState.popupLeft("time", null);
         Process {
             id: dateProc;
             command: ["date", "+%r"];

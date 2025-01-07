@@ -5,7 +5,6 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 import "../Components/" as Components
-
 PopupWindow{
     id: leftPopout
     anchor.edges: Edges.Left | Edges.Top;
@@ -15,7 +14,7 @@ PopupWindow{
     width: Quickshell.screens[0].width * 0.5;
     height: Quickshell.screens[0].height * 0.8;
     visible: Components.GlobalState.left != -1;
-    color: "#77ffffff"
+    color: "#88ffffff"
     mask: Region{
         item: topBarIgnorer;
         intersection: Intersection.Xor; 
@@ -24,7 +23,48 @@ PopupWindow{
         id: topBarIgnorer;
         height: test.height;
         width: leftPopout.width;
-        color: "#11000000";
+        color: "#21000000";
+    }
+    MouseArea{
+        anchors.fill: parent;
+        onClicked: (mouse) =>{
+            Components.GlobalState.left = -1;
+        }
+        onExited: () => {
+            Components.GlobalState.left = -1;
+        }
+        hoverEnabled: true;
+    }
+    Components.StackingCanvas{
+        x: Components.GlobalState.leftPos.x;
+        y: Components.GlobalState.leftPos.y;
+
+        currentIndex: Components.GlobalState.left;
+
+        Audio {}
+        Time {}
+    }
+}
+/*
+PopupWindow{
+    id: leftPopout
+    anchor.edges: Edges.Left | Edges.Top;
+    anchor.gravity: Edges.Bottom | Edges.Right;
+    anchor.rect.width: test.width;
+    anchor.rect.height: test.height;
+    width: Quickshell.screens[0].width * 0.5;
+    height: Quickshell.screens[0].height * 0.8;
+    visible: Components.GlobalState.left != -1;
+    color: "#00ffffff"
+    mask: Region{
+        item: topBarIgnorer;
+        intersection: Intersection.Xor; 
+    }
+    Rectangle{
+        id: topBarIgnorer;
+        height: test.height;
+        width: leftPopout.width;
+        color: "#00000000";
     }
     MouseArea{
         anchors.fill: parent;
@@ -81,3 +121,4 @@ PopupWindow{
         Time{}
     }
 }
+*/
