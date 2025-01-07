@@ -24,6 +24,33 @@ ButtonStrip{
     property var componentFactory: Qt.createComponent("../Dynamic/WorkspaceSection.qml");
 
     Text{
+        color: Colour.fg;
+        font.family: "Iosevka";
+        font.pointSize: 14;
+        horizontalAlignment: Text.AlignHCenter;
+        text: "1!";
+        signal clicked();
+        onClicked: () => GlobalState.popupLeft("audio", Qt.point(x, 60));
+    }
+    Text{
+        color: Colour.fg;
+        font.family: "Iosevka";
+        font.pointSize: 14;
+        horizontalAlignment: Text.AlignHCenter;
+        text: "2!";
+        signal clicked();
+        onClicked: () => GlobalState.popupLeft("time", Qt.point(x, 60));
+    }
+    Text{
+        color: Colour.fg;
+        font.family: "Iosevka";
+        font.pointSize: 14;
+        horizontalAlignment: Text.AlignHCenter;
+        text: "3!";
+        signal clicked();
+        onClicked: () => GlobalState.popupLeft(2, Qt.point(x, 60));
+    }
+    Text{
         id: timer;
         color: Colour.fg;
         width: 120;

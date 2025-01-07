@@ -4,12 +4,15 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import "Sections/" as Sections
+import "Components/" as Components 
+import "Panels/" as Panels 
 
 Scope {
     PanelWindow {
-        color: "#00000000"
-        screen: Quickshell.screens[0]
-        height: 60
+        id: test;
+        color: "#00000000";
+        screen: Quickshell.screens[0];
+        height: 60;
         anchors {
             top: true
             left: true
@@ -29,5 +32,10 @@ Scope {
             Sections.Right{
             }
         }
+        //do different. big window. move rectangle.
+        Panels.PopoutPanel{
+            anchor.window: test;
+        }
     }
+    
 }

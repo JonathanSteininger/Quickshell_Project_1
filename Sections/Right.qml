@@ -109,8 +109,11 @@ ButtonStrip{
         color: Colour.fg;
         font.family: "Iosevka";
         font.pointSize: 14;
+        property var popout: Qt.createComponent("../Panels/Audio.qml").createObject();
         signal clicked();
-        onClicked: () => console.log("hello");
+        onClicked: () => {
+            console.log("clicked");
+        }
         //onTextChanged: parent._update();
         onTextChanged: () => {
             parent._update();
