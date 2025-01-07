@@ -31,7 +31,7 @@ ButtonStrip{
         font.pointSize: 14;
         horizontalAlignment: Text.AlignHCenter;
         signal clicked();
-        onClicked: () => parent.fillWorkspaces();
+        onClicked: () => GlobalState.popoutLeft("time", null);
         Process {
             id: dateProc;
             command: ["date", "+%r"];
@@ -108,7 +108,10 @@ ButtonStrip{
     }
     function updateWorkspaces(commited = false){
         if(commited){
-            children = children.slice(0, 2);
+            var firstWorkspaceIndex=children.findIndex((child) => child instanceof WorkspaceSection);
+            if(firstWorkspaceIndex != -1){
+                children = children.slice(0, firstWorkspaceIndex);
+            }
             children.push(...workspaceSections);
             _update();
             workspaceSectionsGarbage = [];
