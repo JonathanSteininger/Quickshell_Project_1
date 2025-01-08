@@ -6,7 +6,7 @@ import QtQuick.Controls
 
 import "../Components/" as Components
 PopupWindow{
-    id: leftPopout
+    id: root
     anchor.edges: Edges.Left | Edges.Top;
     anchor.gravity: Edges.Bottom | Edges.Right;
     anchor.rect.width: test.width;
@@ -15,33 +15,52 @@ PopupWindow{
     height: Quickshell.screens[0].height * 0.8;
     visible: Components.GlobalState.showLeft;
     color: "#88ffffff"
-    mask: Region{
+    mask: regionTop;
+    
+    property var regionTop: Region{
         item: topBarIgnorer;
         intersection: Intersection.Xor; 
     }
+    property var regionPopout: Region{
+        item: stack;
+    }
+
     Rectangle{
         id: topBarIgnorer;
         height: test.height;
-        width: leftPopout.width;
+        width: root.width;
         color: "#21000000";
     }
     MouseArea{
         anchors.fill: parent;
         onClicked: (mouse) =>{
-            Components.GlobalState.left = -1;
+            root.hidePopout();
         }
         onExited: () => {
-            Components.GlobalState.left = -1;
+            root.hidePopout();
         }
         hoverEnabled: true;
     }
+    signal hidePopout()
+    onHidePopout: {
+        //swap to popout region when closing window to restore imediate mouse clicks.
+        mask = regionPopout;
+        Components.GlobalState.left = -1;
+    }
+    onVisibleChanged: {
+        if(visible){
+            //use top bar ignorer when turning visible
+            mask = regionTop;
+        }
+    }
     Components.StackingCanvas{
+        id: stack
         x: Components.GlobalState.leftPos.x;
         y: Components.GlobalState.leftPos.y;
          
         cornerSize: 20;
         padding: 15;
-        borderSize: 0;
+        borderSize: 2;
 
         duration: 400;
 
