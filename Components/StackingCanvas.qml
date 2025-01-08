@@ -3,10 +3,11 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Shapes
 
 pragma ComponentBehavior: Bound;
 
-Canvas{
+Shape{
     id: root;
     implicitWidth: 50;
     implicitHeight: 50;
@@ -20,7 +21,6 @@ Canvas{
             return null;
         return childContainer.children[currentIndex];
     }
-    property bool animate: false;
     property real cornerSize: 10;
     property real _top: cornerSize;
     property real _left: cornerSize;
@@ -38,13 +38,6 @@ Canvas{
 
     component SimpleBehavior: Behavior{
         SequentialAnimation{
-            ScriptAction{
-                script: {
-                    animationDelay.restart();
-                    animationDelay.running = true;
-                    root.animate = true;
-                }
-            }
             PropertyAnimation{
                 duration: root.duration;
                 easing.type: Easing.OutExpo;
@@ -52,47 +45,29 @@ Canvas{
         }
     }
 
-    SimpleBehavior on width{}
-    SimpleBehavior on height{}
-    SimpleBehavior on x{}
-    SimpleBehavior on y{}
+    SimpleBehavior on width {}
+    SimpleBehavior on height {}
+    SimpleBehavior on x {}
+    SimpleBehavior on y {}
 
-
-    Timer{
-        id: animationDelay;
-        interval: root.duration + 50;
-        onTriggered: root.animate = false;
+    ShapePath{
+        fillColor: root.color;
+        strokeColor: root.borderColor;
+        strokeStyle: ShapePath.SolidLine;
+        strokeWidth: root.borderSize;
+        startX: root.cornerSize;
+        startY: 0;
+        PathLine { x: root.width - root.cornerSize; y: 0 }
+        PathLine { x: root.width; y: root.cornerSize; }
+        PathLine { x: root.width; y: root.height - root.cornerSize; }
+        PathLine { x: root.width - root.cornerSize; y: root.height; }
+        PathLine { x: root.cornerSize; y: root.height; }
+        PathLine { x: 0; y: root.height - root.cornerSize; }
+        PathLine { x: 0; y: root.cornerSize; }
+        PathLine { x: root.cornerSize; y: 0; }
     }
 
 
-    FrameAnimation{
-        running: root.animate;
-        onTriggered: () => root.requestPaint();
-    }
-
-    function paintBackground(ctx){
-        ctx.beginPath();
-        ctx.fillStyle = color
-        ctx.strokeStyle = borderColor
-        ctx.lineWidth = borderSize;
-        ctx.moveTo(_left, 0);
-        ctx.lineTo(_right, 0);
-        ctx.lineTo(width, _top);
-        ctx.lineTo(width, _bottom);
-        ctx.lineTo(_right, height);
-        ctx.lineTo(_left, height);
-        ctx.lineTo(0, _bottom);
-        ctx.lineTo(0, _top);
-        ctx.lineTo(_left, 0);
-        ctx.fill();
-        ctx.stroke();
-        ctx.closePath();
-    }
-
-    onPaint: {
-        var ctx = getContext("2d");
-        paintBackground(ctx);
-    }
     clip: true;
 
     Item{
