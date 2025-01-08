@@ -6,16 +6,21 @@ import QtQuick.Controls
 
 import "../Components/" as Components
 PopupWindow{
-    id: root
-    anchor.edges: Edges.Left | Edges.Top;
+    id: root;
+    default property alias data: stack.data;
+    anchor.edges: Edges.Left | Edges.Bottom;
     anchor.gravity: Edges.Bottom | Edges.Right;
-    anchor.rect.width: test.width;
-    anchor.rect.height: test.height;
+    anchor.rect.width: anchor.window.width;
+    anchor.rect.height: anchor.window.height;
     width: Quickshell.screens[0].width * 0.5;
     height: Quickshell.screens[0].height * 0.8;
-    visible: Components.GlobalState.showLeft;
-    color: "#88ffffff"
+    visible: true;
+    color: Components.Colour.trans;
     mask: regionTop;
+
+    required property int currentPopout;
+    required property int popoutX;
+    required property int popoutY;
     
     property var regionTop: Region{
         item: topBarIgnorer;
@@ -27,9 +32,9 @@ PopupWindow{
 
     Rectangle{
         id: topBarIgnorer;
-        height: test.height;
+        height: 5;
         width: root.width;
-        color: "#21000000";
+        color: Components.Colour.trans;
     }
     MouseArea{
         anchors.fill: parent;
@@ -45,8 +50,13 @@ PopupWindow{
     onHidePopout: {
         //swap to popout region when closing window to restore imediate mouse clicks.
         mask = regionPopout;
-        Components.GlobalState.left = -1;
+        changeCurrentPopout(-1);
     }
+
+    signal changeCurrentPopout(value:int)
+    signal changeVisibility(value:bool)
+    signal changePos(x:int,y:int)
+
     onVisibleChanged: {
         if(visible){
             //use top bar ignorer when turning visible
@@ -55,8 +65,10 @@ PopupWindow{
     }
     Components.StackingCanvas{
         id: stack
-        x: Components.GlobalState.leftPos.x;
-        y: Components.GlobalState.leftPos.y;
+        x: root.popoutX;
+        y: root.popoutY;
+        color: Components.Colour.bg;
+        borderColor: Components.Colour.accent;
          
         cornerSize: 20;
         padding: 15;
@@ -64,100 +76,20 @@ PopupWindow{
 
         duration: 400;
 
-        currentIndex: Components.GlobalState.left;
-
-        Audio {}
-        Time {}
+        currentIndex: root.currentPopout;
 
         onDeselect: {
-            Components.GlobalState.showLeft = false;
+            root.changeVisibility(false);
         }
         onSelect: {
-            Components.GlobalState.showLeft = true;
+            root.changeVisibility(true);
         }
 
         onCurrentIndexChanged: {
             if(currentIndex == -1){
-                Components.GlobalState.leftPos.y = -height;    
-                height: 60;
+                height = 60;
+                root.changePos(root.popoutX, -60)
             }
         }
     }
 }
-/*
-PopupWindow{
-    id: leftPopout
-    anchor.edges: Edges.Left | Edges.Top;
-    anchor.gravity: Edges.Bottom | Edges.Right;
-    anchor.rect.width: test.width;
-    anchor.rect.height: test.height;
-    width: Quickshell.screens[0].width * 0.5;
-    height: Quickshell.screens[0].height * 0.8;
-    visible: Components.GlobalState.left != -1;
-    color: "#00ffffff"
-    mask: Region{
-        item: topBarIgnorer;
-        intersection: Intersection.Xor; 
-    }
-    Rectangle{
-        id: topBarIgnorer;
-        height: test.height;
-        width: leftPopout.width;
-        color: "#00000000";
-    }
-    MouseArea{
-        anchors.fill: parent;
-        onClicked: (mouse) =>{
-            Components.GlobalState.left = -1;
-        }
-        onExited: () => {
-            Components.GlobalState.left = -1;
-        }
-        hoverEnabled: true;
-    }
-    StackLayout{
-        id: layout;
-        y: Components.GlobalState.leftPos.y;
-        x: Components.GlobalState.leftPos.x;
-        currentIndex: Components.GlobalState.left;
-        Behavior on y { 
-            PropertyAnimation{
-                duration: 200;
-                easing.type: Easing.InOutQuad;
-            }
-        }
-        Behavior on x { 
-            PropertyAnimation{
-                duration: 200;
-                easing.type: Easing.InOutQuad;
-            }
-        }
-        Behavior on width { 
-            PropertyAnimation{
-                duration: 200;
-                easing.type: Easing.InOutQuad;
-            }
-        }
-        Behavior on height { 
-            PropertyAnimation{
-                duration: 200;
-                easing.type: Easing.InOutQuad;
-            }
-        }
-        onCurrentIndexChanged: {
-            if(currentIndex < 0 || currentIndex >= children.length){
-                Components.GlobalState.left = -1;
-                return
-            }
-            //x = children[currentIndex].x1;
-            //y = children[currentIndex].y1;
-            width = children[currentIndex]._width;
-            height = children[currentIndex]._height;
-            console.log(children[currentIndex].width);
-            console.log(width);
-        }
-        Audio{}
-        Time{}
-    }
-}
-*/

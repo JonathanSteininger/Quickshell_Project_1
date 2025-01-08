@@ -32,10 +32,49 @@ Scope {
             Sections.Right{
             }
         }
-        //do different. big window. move rectangle.
-        Panels.PopoutPanel{
-            anchor.window: test;
-        }
     }
     
+    Panels.PopoutPanel{
+        anchor.window: test;
+        visible: Components.GlobalState.showLeft;
+        currentPopout: Components.GlobalState.left;
+        popoutX: Components.GlobalState.leftPos.x;
+        popoutY: Components.GlobalState.leftPos.y;
+        onChangeCurrentPopout: (value) => {
+            Components.GlobalState.left = value;
+        }
+        onChangeVisibility: (value) => {
+            Components.GlobalState.showLeft = value;
+        }
+        onChangePos: (x, y) => {
+            Components.GlobalState.leftPos.x = x;
+            Components.GlobalState.leftPos.y = y;
+        }
+
+
+        anchor.rect.y: -6;
+        Panels.Audio {}
+        Panels.Time {}
+
+    }
+    /*
+    Panels.PopoutPanel{
+        anchor.window: test;
+        visible: Components.GlobalState.showMiddle;
+        anchor.gravity: Edges.Bottom;
+        anchor.edges: Edges.Bottom;
+        anchor.rect.y: -6;
+        Panels.Audio {}
+        Panels.Time {}
+    }
+    Panels.PopoutPanel{
+        anchor.window: test;
+        visible: Components.GlobalState.showRight;
+        anchor.gravity: Edges.Bottom | Edges.Right;
+        anchor.edges: Edges.Bottom | Edges.Left;
+        anchor.rect.y: -6;
+        Panels.Audio {}
+        Panels.Time {}
+    }
+    */
 }

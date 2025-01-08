@@ -50,13 +50,16 @@ Shape{
     SimpleBehavior on x {}
     SimpleBehavior on y {}
 
+
     ShapePath{
+        joinStyle: ShapePath.MiterJoin;
         fillColor: root.color;
         strokeColor: root.borderColor;
         strokeStyle: ShapePath.SolidLine;
         strokeWidth: root.borderSize;
         startX: root.cornerSize;
         startY: 0;
+        pathHints: ShapePath.PathLinear + ShapePath.PathSolid + ShapePath.PathFillOnRight + ShapePath.PathConvex + ShapePath.PathNonIntersecting;
         PathLine { x: root.width - root.cornerSize; y: 0 }
         PathLine { x: root.width; y: root.cornerSize; }
         PathLine { x: root.width; y: root.height - root.cornerSize; }
@@ -67,8 +70,7 @@ Shape{
         PathLine { x: root.cornerSize; y: 0; }
     }
 
-
-    clip: true;
+    clip: false;
 
     Item{
         id: childContainer;
@@ -86,7 +88,6 @@ Shape{
         }
         onChildIndexChanged: () => {
             //testAnimation.start();
-            console.log("changeto", childIndex);
             if(childIndex >= 0 && childIndex < children.length){
                 root.select();
             }
@@ -132,7 +133,6 @@ Shape{
 
 
         function swapSize():void{
-            console.log(childIndex);
             if(childIndex < 0 || childIndex >= children.length){
                 return;
             }
