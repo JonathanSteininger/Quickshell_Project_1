@@ -29,6 +29,12 @@ Canvas{
     property var color: "white";
     property var borderColor: "black";
     property real borderSize: 2;
+    property real padding: 5;
+
+    property int duration: 400;
+    
+    signal deselect();
+    signal select();
 
     component SimpleBehavior: Behavior{
         SequentialAnimation{
@@ -40,7 +46,7 @@ Canvas{
                 }
             }
             PropertyAnimation{
-                duration: 800;
+                duration: root.duration;
                 easing.type: Easing.OutExpo;
             }
         }
@@ -54,7 +60,7 @@ Canvas{
 
     Timer{
         id: animationDelay;
-        interval: 850;
+        interval: root.duration + 50;
         onTriggered: root.animate = false;
     }
 
@@ -94,24 +100,34 @@ Canvas{
         onChildrenChanged: () =>{
             setupChildren();
         }
-        x: 5;
-        y: 5;
+        x: root.padding;
+        y: root.padding;
         property int childIndex: -1;
         property int pastIndex: -1;
         function setupChildren(){
-                console.log("setup start");
             for(var i = 0; i < children.length; i++){
-                console.log("setup");
                 children[i].visible = childIndex == i;
-                console.log(children[i].visible);
             }
         }
         onChildIndexChanged: () => {
-            testAnimation.start();
+            //testAnimation.start();
+            console.log("changeto", childIndex);
+            if(childIndex >= 0 && childIndex < children.length){
+                root.select();
+            }
+            ticker++;
         }
+        function animationCompleted(){
+            if(childIndex == -1){
+                root.deselect();
+            }
+        }
+        property int ticker: 0;
         clip: true;
 
-        SequentialAnimation{
+        
+        Behavior on ticker{
+        SequentialAnimation {
             id: testAnimation;
             ScriptAction{
                 script: childContainer.swapSize();
@@ -120,8 +136,8 @@ Canvas{
                 target: childContainer;
                 properties: "opacity";
                 to: 0;
-                duration: 200;
-                easing.type: Easing.OutExpo;
+                duration: root.duration / 2;
+                easing.type: Easing.OutQuad;
             }
             ScriptAction{
                 script: childContainer.swap();
@@ -130,32 +146,28 @@ Canvas{
                 target: childContainer;
                 properties: "opacity";
                 to: 1;
-                duration: 200;
-                easing.type: Easing.InExpo;
+                duration: root.duration / 2;
+                easing.type: Easing.InQuad;
+            }
+            ScriptAction{
+                script: childContainer.animationCompleted();
             }
         }
+    }
 
 
         function swapSize():void{
-            width = children[childIndex].width;
-            height = children[childIndex].height;
-            root.width = width + 10;
-            root.height = height + 10;
-        }
-
-        function swap():void {
-            console.log("THIS", childIndex);
-            if(pastIndex == childIndex){
-                children[childIndex].visible = true;
-                return;
-            }
+            console.log(childIndex);
             if(childIndex < 0 || childIndex >= children.length){
                 return;
             }
-            if(pastIndex > 0 && pastIndex < children.length){
-                children[pastIndex].visible = false;
-            }
-            children[childIndex].visible = true;
+            width = children[childIndex].width;
+            height = children[childIndex].height;
+            root.width = children[childIndex].width + root.padding*2;
+            root.height = children[childIndex].height + root.padding*2;
+        }
+
+        function swap():void {
             for(var i = 0; i < children.length; i++){
                 children[i].visible = childIndex == i;
             }

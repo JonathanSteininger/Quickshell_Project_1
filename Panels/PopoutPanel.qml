@@ -13,7 +13,7 @@ PopupWindow{
     anchor.rect.height: test.height;
     width: Quickshell.screens[0].width * 0.5;
     height: Quickshell.screens[0].height * 0.8;
-    visible: Components.GlobalState.left != -1;
+    visible: Components.GlobalState.showLeft;
     color: "#88ffffff"
     mask: Region{
         item: topBarIgnorer;
@@ -38,11 +38,31 @@ PopupWindow{
     Components.StackingCanvas{
         x: Components.GlobalState.leftPos.x;
         y: Components.GlobalState.leftPos.y;
+         
+        cornerSize: 20;
+        padding: 15;
+        borderSize: 0;
+
+        duration: 400;
 
         currentIndex: Components.GlobalState.left;
 
         Audio {}
         Time {}
+
+        onDeselect: {
+            Components.GlobalState.showLeft = false;
+        }
+        onSelect: {
+            Components.GlobalState.showLeft = true;
+        }
+
+        onCurrentIndexChanged: {
+            if(currentIndex == -1){
+                Components.GlobalState.leftPos.y = -height;    
+                height: 60;
+            }
+        }
     }
 }
 /*

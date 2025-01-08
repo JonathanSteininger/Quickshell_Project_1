@@ -11,6 +11,7 @@ Singleton {
         leftPos.y = point.y;
     }
     property int left: -1;
+    property bool showLeft: false;
     property point leftPos: Qt.point(0, 60);
 
     property list<string> leftMap:[
