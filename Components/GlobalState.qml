@@ -91,16 +91,19 @@ Singleton {
     }
     //put checks for things you want to track here. will automatically grab those nodes
     function updateTrackers(){
-        console.log("saveNode");
+        console.log("amountofNodes:", Pipewire.nodes.values.length);
         Pipewire.nodes.values.forEach((node) => {
-            if(node.isSink && !node.isStream){
+            if(node.isSink && !node.isStream && node.audio){
+                saveNode(node);
+            } else if(!node.isSink && node.isStream && node.audio){
+                console.log(node.name, node.audio.channels.length);
+                console.log(node.name, node.properties["volume"]);
                 saveNode(node);
             }
         })
     }
     function saveNode(node: PwNode): void{
         if(!objectTracker.objects.some((child) => compareNodes(child, node))){
-            console.log("saveNode", node.id);
             objectTracker.objects.push(node);
         }
     }

@@ -82,7 +82,7 @@ PopupWindow{
         borderColor: Components.Colour.accent;
          
         cornerSize: 20;
-        padding: 15;
+        padding: 10;
         borderSize: 2;
 
         duration: 400;

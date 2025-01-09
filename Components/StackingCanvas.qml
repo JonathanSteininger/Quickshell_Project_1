@@ -13,6 +13,7 @@ Shape{
     implicitHeight: 50;
 
     default property alias data: childContainer.data;
+    property alias internalClip: childContainer.clip;
 
     property alias currentIndex: childContainer.childIndex;
 
