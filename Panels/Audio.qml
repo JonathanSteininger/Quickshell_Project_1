@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 import QtQml.Models
 import "../Components/" as Components
 import Quickshell.Services.Pipewire
@@ -12,6 +13,7 @@ Rectangle{
     height: 800;
     property PwObjectTracker tracker: Components.GlobalState.tracker;
     Rectangle{
+        color: Components.Colour.trans;
         DelegateModel{
             id: sinkModel;
             model: Pipewire.nodes.values;
@@ -24,28 +26,30 @@ Rectangle{
             filterOnGroup: "outputDevice";
             delegate: Rectangle{
                 id: item
-                width: 250;
+                width: root.width;
                 height: 50;
-                color: "white";
+                border.color: Components.Colour.accent;
+                border.width: 1;
+                color: Components.GlobalState.defaultAudio.id == id ? Components.Colour.accent : Components.Colour.trans;
                 Text {
                     anchors.top: parent.top;
-                    color: "black";
-                    text: name;
+                    color: Components.Colour.fg;
+                    text: description;
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter;
-                    color: "black";
+                    color: Components.Colour.fg;
                     text: nickname;
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.right: parent.right;
-                    color: "black";
+                    color: Components.Colour.fg;
                     text: id;
                 }
                 Text {
                     anchors.bottom: parent.bottom;
-                    color: "black"
+                    color: Components.Colour.fg;
                     text: audio.volume;
                 }
                 Component.onCompleted: {
@@ -69,11 +73,29 @@ Rectangle{
                 }
             }
         }
-        color: Components.Colour.trans;
 
         ColumnLayout{
             Repeater{
                 model: sinkModel;
+            }
+            Rectangle{
+                color: Components.Colour.trans;
+                width: root.width;
+                height: 40;
+                Rectangle{
+                    anchors.verticalCenter: parent.verticalCenter;
+                    width: root.width;
+                    height: 2;
+                    color: "white";
+                }
+            }
+            Repeater{
+                model: 10;
+            Rectangle{
+                width: root.width;
+                height: 40;
+                color: "blue";
+            }
             }
         }
     }
