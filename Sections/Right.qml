@@ -109,51 +109,18 @@ ButtonStrip{
     }
     Text{
         id: volume
-        property var defaultAudioSink: Pipewire.defaultAudioSink;
-        property variant _properties: defaultAudioSink.properties;
-        text: defaultAudioSink.id;
+        property real volume: GlobalState.defaultAudio.audio.volume;
+        text: `${Math.floor(this.volume*100)}%`;
         color: Colour.fg;
         font.family: "Iosevka";
         font.pointSize: 14;
-        property var popout: Qt.createComponent("../Panels/Audio.qml").createObject();
         signal clicked();
         onClicked: () => {
-            GlobalState.popupRight("audio", rightPanel.convertPopoutPosition( x, width));
+            GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
         }
         //onTextChanged: parent._update();
         onTextChanged: () => {
             parent._update();
-        }
-        onDefaultAudioSinkChanged: {
-            audioTracker.objects.push(defaultAudioSink);
-            //text = defaultAudioSink.properties["media.name"];
-            getVolumeProc.running = true;
-        }
-        PwObjectTracker{
-            id: audioTracker;
-        }
-
-        Process{
-            id: getVolumeProc;
-            running: false;
-            command: ["sh", "-c", `pw-dump ${volume.defaultAudioSink.id} | jq '.[0].info.params.Props.[0].volume | sqrt * 100'`];
-            stdout: SplitParser{
-                onRead: (data) => volume.text = `${data}% 󰕾`;
-            }//U+1F56
-            stderr: SplitParser{
-                onRead: (data) => {
-                    console.log("volume process failed... or some other error.");
-                    console.log("volume error:", data);
-                    volume.destroy();
-                }
-            }
-            onExited: (exitCode, exitStatus) => {
-                if(exitCode != 0){
-                    console.log("error code returned from volume process:", exitCode);
-                    volume.destroy();
-                }
-            }
-            
         }
     }
     Text{

@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell 
 import QtQuick
+import Quickshell.Services.Pipewire
 
 Singleton {
     property int popupOffset: 8;
@@ -68,5 +69,39 @@ Singleton {
 
 
 
-
+    //tracks default audio.
+    readonly property PwNode defaultAudio: Pipewire.defaultAudioSink;
+    onDefaultAudioChanged: {
+        objectTracker.objects.pop();
+        objectTracker.objects.push(defaultAudio);
+    }
+    property PwObjectTracker tracker: PwObjectTracker{
+        id: objectTracker;
+        Component.onCompleted: {
+        return;
+            objects.push(...Pipewire.nodes.values)
+        }
+    }
+    Component.onCompleted: {
+        updateTrackers();
+        Pipewire.nodes.onValuesChanged.connect(updateTrackers);
+    }
+    function compareNodes(a: PwNode, b:PwNode):bool {
+        return a.id == b.id && a.name == b.name;
+    }
+    //put checks for things you want to track here. will automatically grab those nodes
+    function updateTrackers(){
+        console.log("saveNode");
+        Pipewire.nodes.values.forEach((node) => {
+            if(node.isSink && !node.isStream){
+                saveNode(node);
+            }
+        })
+    }
+    function saveNode(node: PwNode): void{
+        if(!objectTracker.objects.some((child) => compareNodes(child, node))){
+            console.log("saveNode", node.id);
+            objectTracker.objects.push(node);
+        }
+    }
 }
