@@ -14,9 +14,6 @@ Rectangle{
     height: frame.height + manualGap * 2;
     property real maxHeight: 800;
     property PwObjectTracker tracker: Components.GlobalState.tracker;
-    Component.onCompleted: {
-        console.log("height", column.height)
-    }
     clip: false
     MouseArea{
         width: root.width;
@@ -48,22 +45,19 @@ Rectangle{
                 border.color: Components.Colour.accent;
                 border.width: 1;
                 clip: true;
-                color: Components.GlobalState.defaultAudio.id == id ? Components.Colour.accent : Components.Colour.trans;
+                color: Components.Colour.trans;
                 Text {
                     anchors.top: parent.top;
                     color: Components.Colour.fg;
                     text: name;
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter;
-                    color: Components.Colour.fg;
-                    text: nickname;
                 }
                 Slider{
                     anchors.verticalCenter: parent.verticalCenter;
                     from: 0;
                     value: audioNode.volume;
                     to: 1.5;
+                    snapMode: Slider.SnapAlways;
+                    stepSize: 0.025;
                     onMoved: {
                         audioNode.volume = value;
                     }
@@ -77,7 +71,7 @@ Rectangle{
                 Text {
                     anchors.bottom: parent.bottom;
                     color: Components.Colour.fg;
-                    text: audio.volume;
+                    text: `${Math.round(audio.volume * 1000)/10}%`;
                 }
             }
             items.onChanged: {
@@ -125,6 +119,8 @@ Rectangle{
                     value: audioNode.volume;
                     anchors.verticalCenter: parent.verticalCenter;
                     to: 1.5;
+                    snapMode: Slider.SnapAlways;
+                    stepSize: 0.025;
                     onMoved: {
                         audioNode.volume = value;
                     }
@@ -144,7 +140,7 @@ Rectangle{
                 Text {
                     anchors.bottom: parent.bottom;
                     color: Components.Colour.fg;
-                    text: audio.volume;
+                    text: `${Math.round(audio.volume * 1000)/10}%`;
                 }
             }
             items.onChanged: {
@@ -180,7 +176,7 @@ Rectangle{
                     anchors.verticalCenter: parent.verticalCenter;
                     width: frame.width;
                     height: 2;
-                    color: "white";
+                    color: Components.Colour.accent;
                 }
             }
             Flickable{
@@ -198,17 +194,16 @@ Rectangle{
                     spacing: 5;
                     model: streamModel;
                 }
-                //ScrollBar.vertical.policy: ScrollBar.AlwaysOff;
             }
         }
     }
-        Rectangle{
-            width: 3;
-            y: flickable.visibleArea.yPosition * flickable.height + flickable.y + root.manualGap;
-            anchors.right: root.right;
-            radius: 5;
-            color: Components.Colour.accent;
-            visible: height < flickable.height;
-            height: flickable.visibleArea.heightRatio * flickable.height;
-        }
+    Rectangle{
+        width: 3;
+        y: flickable.visibleArea.yPosition * flickable.height + flickable.y + root.manualGap;
+        anchors.right: root.right;
+        radius: 5;
+        color: Components.Colour.accent;
+        visible: height < flickable.height;
+        height: flickable.visibleArea.heightRatio * flickable.height;
+    }
 }
