@@ -6,6 +6,7 @@ import QtQuick.Controls
 import "../Components/"
 
 CenterButtonStrip{
+    id: root;
     anchors.centerIn: parent
     tiltStrength: 1
     borderColor: Colour.accent;
@@ -15,6 +16,10 @@ CenterButtonStrip{
     Text{
         color: Colour.fg
         text: "rectangle"
+        signal clicked()
+        onClicked: () => {
+            GlobalState.popupMiddle("audio", root.convertPopoutPosition(x, width));
+        }
     }
     Text{
         property bool center: true;
@@ -22,9 +27,22 @@ CenterButtonStrip{
         width: 120
         horizontalAlignment: Text.AlignHCenter;
         text: "rectangle"
+        signal clicked()
+        onClicked: () => {
+            GlobalState.popupMiddle("time", root.convertPopoutPosition(x, width));
+        }
     }
     Text{
         color: Colour.fg
         text: "rectangle"
+        signal clicked()
+        onClicked: () => {
+            GlobalState.popupMiddle("audio", root.convertPopoutPosition(x, width));
+        }
+    }
+
+    function convertPopoutPosition(_x, _width){
+        var output = _x + _width/2 - this.width/2;
+        return output;
     }
 }

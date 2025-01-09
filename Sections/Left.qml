@@ -30,7 +30,7 @@ ButtonStrip{
         horizontalAlignment: Text.AlignHCenter;
         text: "1!";
         signal clicked();
-        onClicked: () => GlobalState.popupLeft("audio", Qt.point(x, GlobalState.popupOffset));
+        onClicked: () => GlobalState.popupLeft("audio", x);
     }
     Text{
         color: Colour.fg;
@@ -39,7 +39,7 @@ ButtonStrip{
         horizontalAlignment: Text.AlignHCenter;
         text: "2!";
         signal clicked();
-        onClicked: () => GlobalState.popupLeft("time", Qt.point(x, GlobalState.popupOffset));
+        onClicked: () => GlobalState.popupLeft("time", x);
     }
     Text{
         color: Colour.fg;
@@ -48,7 +48,7 @@ ButtonStrip{
         horizontalAlignment: Text.AlignHCenter;
         text: "3!";
         signal clicked();
-        onClicked: () => GlobalState.popupLeft(2, Qt.point(x, GlobalState.popupOffset));
+        onClicked: () => GlobalState.popupLeft(2, x);
     }
     Text{
         id: timer;

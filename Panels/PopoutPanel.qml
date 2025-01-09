@@ -18,6 +18,8 @@ PopupWindow{
     color: Components.Colour.trans;
     mask: regionTop;
 
+    property string windowGravity: "right";
+
     required property int currentPopout;
     required property int popoutX;
     required property int popoutY;
@@ -65,7 +67,16 @@ PopupWindow{
     }
     Components.StackingCanvas{
         id: stack
-        x: root.popoutX;
+        x: {
+            switch(root.windowGravity){
+                case "left":
+                    return root.width - root.popoutX - targetWidth + padding;
+                case "bottom":
+                    return root.popoutX - targetWidth /2 + root.width/2 + (root.popoutX > 10 ? -padding : (root.popoutX < -10 ? padding : 0));
+            }
+            return root.popoutX - padding;
+
+        }
         y: root.popoutY;
         color: Components.Colour.bg;
         borderColor: Components.Colour.accent;
@@ -75,6 +86,14 @@ PopupWindow{
         borderSize: 2;
 
         duration: 400;
+        property real targetWidth: width;
+        property real targetHeight: height;
+        onSetWidth: (value) => {
+            targetWidth = value;
+        }
+        onSetHeight: (value) => {
+            targetHeight= value;
+        }
 
         currentIndex: root.currentPopout;
 

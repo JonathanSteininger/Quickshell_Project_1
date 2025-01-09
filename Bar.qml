@@ -40,6 +40,7 @@ Scope {
         currentPopout: Components.GlobalState.left;
         popoutX: Components.GlobalState.leftPos.x;
         popoutY: Components.GlobalState.leftPos.y;
+        windowGravity: "right";
         onChangeCurrentPopout: (value) => {
             Components.GlobalState.left = value;
         }
@@ -50,31 +51,56 @@ Scope {
             Components.GlobalState.leftPos.x = x;
             Components.GlobalState.leftPos.y = y;
         }
-
-
         anchor.rect.y: -6;
         Panels.Audio {}
         Panels.Time {}
-
     }
-    /*
+
     Panels.PopoutPanel{
         anchor.window: test;
-        visible: Components.GlobalState.showMiddle;
-        anchor.gravity: Edges.Bottom;
         anchor.edges: Edges.Bottom;
+        anchor.gravity: Edges.Bottom;
+        visible: Components.GlobalState.showMiddle;
+        currentPopout: Components.GlobalState.middle;
+        popoutX: Components.GlobalState.middlePos.x;
+        popoutY: Components.GlobalState.middlePos.y;
+        windowGravity: "bottom";
+        onChangeCurrentPopout: (value) => {
+            Components.GlobalState.middle = value;
+        }
+        onChangeVisibility: (value) => {
+            Components.GlobalState.showMiddle = value;
+        }
+        onChangePos: (x, y) => {
+            Components.GlobalState.middlePos.x = x;
+            Components.GlobalState.middlePos.y = y;
+        }
         anchor.rect.y: -6;
         Panels.Audio {}
         Panels.Time {}
     }
+
     Panels.PopoutPanel{
         anchor.window: test;
+        anchor.edges: Edges.Bottom | Edges.Right;
+        anchor.gravity: Edges.Bottom | Edges.Left;
         visible: Components.GlobalState.showRight;
-        anchor.gravity: Edges.Bottom | Edges.Right;
-        anchor.edges: Edges.Bottom | Edges.Left;
+        currentPopout: Components.GlobalState.right;
+        popoutX: Components.GlobalState.rightPos.x;
+        popoutY: Components.GlobalState.rightPos.y;
+        windowGravity: "left";
+        onChangeCurrentPopout: (value) => {
+            Components.GlobalState.right = value;
+        }
+        onChangeVisibility: (value) => {
+            Components.GlobalState.showRight = value;
+        }
+        onChangePos: (x, y) => {
+            Components.GlobalState.rightPos.x = x;
+            Components.GlobalState.rightPos.y = y;
+        }
         anchor.rect.y: -6;
         Panels.Audio {}
         Panels.Time {}
     }
-    */
 }

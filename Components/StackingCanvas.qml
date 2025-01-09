@@ -72,6 +72,15 @@ Shape{
 
     clip: false;
 
+    signal setWidth(value: real)
+    signal setHeight(value: real)
+    onSetWidth: (value) => {
+        width = value;
+    }
+    onSetHeight: (value) => {
+        height = value;
+    }
+
     Item{
         id: childContainer;
         onChildrenChanged: () =>{
@@ -103,43 +112,52 @@ Shape{
 
         
         Behavior on ticker{
-        SequentialAnimation {
-            id: testAnimation;
-            ScriptAction{
-                script: childContainer.swapSize();
-            }
-            NumberAnimation{
-                target: childContainer;
-                properties: "opacity";
-                to: 0;
-                duration: root.duration / 2;
-                easing.type: Easing.OutQuad;
-            }
-            ScriptAction{
-                script: childContainer.swap();
-            }
-            NumberAnimation{
-                target: childContainer;
-                properties: "opacity";
-                to: 1;
-                duration: root.duration / 2;
-                easing.type: Easing.InQuad;
-            }
-            ScriptAction{
-                script: childContainer.animationCompleted();
+            SequentialAnimation {
+                id: testAnimation;
+                ScriptAction{
+                    script: childContainer.swapSize();
+                }
+                NumberAnimation{
+                    target: childContainer;
+                    properties: "opacity";
+                    to: 0;
+                    duration: root.duration / 2;
+                    easing.type: Easing.OutQuad;
+                }
+                ScriptAction{
+                    script: childContainer.swap();
+                }
+                NumberAnimation{
+                    target: childContainer;
+                    properties: "opacity";
+                    to: 1;
+                    duration: root.duration / 2;
+                    easing.type: Easing.InQuad;
+                }
+                ScriptAction{
+                    script: childContainer.animationCompleted();
+                }
             }
         }
-    }
 
+
+        signal setWidth(value: real)
+        signal setHeight(value: real)
+        onSetWidth: (value) => {
+            width = value;
+            root.setWidth(value + root.padding*2);
+        }
+        onSetHeight: (value) => {
+            height = value;
+            root.setHeight(value + root.padding*2);
+        }
 
         function swapSize():void{
             if(childIndex < 0 || childIndex >= children.length){
                 return;
             }
-            width = children[childIndex].width;
-            height = children[childIndex].height;
-            root.width = children[childIndex].width + root.padding*2;
-            root.height = children[childIndex].height + root.padding*2;
+            setWidth(children[childIndex].width);
+            setHeight(children[childIndex].height);
         }
 
         function swap():void {

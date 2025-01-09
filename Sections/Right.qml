@@ -17,6 +17,10 @@ ButtonStrip{
     tiltRight: true;
     tiltStrength: 1
     implicitHeight: 50;
+
+    function convertPopoutPosition(_x, _width){
+        return width - (_x + _width);
+    }
     Text{
         text: " ";
         color: Colour.fg;
@@ -71,7 +75,9 @@ ButtonStrip{
         horizontalAlignment: Text.AlignHCenter;
         width: 30;
         signal clicked();
-        onClicked: () => console.log("open brightness");
+        onClicked: () =>{
+            GlobalState.popupRight("time",rightPanel.convertPopoutPosition( x, width));
+        }
 
     }
     Repeater{
@@ -112,7 +118,7 @@ ButtonStrip{
         property var popout: Qt.createComponent("../Panels/Audio.qml").createObject();
         signal clicked();
         onClicked: () => {
-            console.log("clicked");
+            GlobalState.popupRight("audio", rightPanel.convertPopoutPosition( x, width));
         }
         //onTextChanged: parent._update();
         onTextChanged: () => {

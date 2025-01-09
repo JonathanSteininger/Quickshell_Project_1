@@ -8,11 +8,13 @@ Singleton {
 
 
 
-    function popupLeft(id: string, point: point): void{
+    function popupLeft(id: string, x: int): void{
         var lower = id.toLowerCase();
         left = leftMap.findIndex((child) => child == lower);
-        leftPos.x = point.x;
-        leftPos.y = point.y;
+        leftPos.x = x;
+        leftPos.y = popupOffset;
+        middle = -1;
+        right = -1;
     }
     property bool showLeft: false;
     property int left: -1;
@@ -27,11 +29,13 @@ Singleton {
 
 
 
-    function popupMiddle(id: string, point: point): void{
+    function popupMiddle(id: string, x: int): void{
         var lower = id.toLowerCase();
         middle = middleMap.findIndex((child) => child == lower);
-        middlePos.x = point.x;
-        middlePos.y = point.y;
+        middlePos.x = x;
+        middlePos.y = popupOffset;
+        left= -1;
+        right = -1;
     }
     property int middle: -1;
     property bool showMiddle: false;
@@ -45,11 +49,13 @@ Singleton {
 
 
 
-    function popupRight(id: string, point: point): void{
+    function popupRight(id: string, x:int): void{
         var lower = id.toLowerCase();
         right = rightMap.findIndex((child) => child == lower);
-        rightPos.x = point.x;
-        rightPos.y = point.y;
+        rightPos.x = x;
+        rightPos.y = popupOffset;
+        left= -1;
+        middle= -1;
     }
     property int right: -1;
     property bool showRight: false;
