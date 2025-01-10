@@ -38,16 +38,6 @@ PopupWindow{
         width: root.width;
         color: Components.Colour.trans;
     }
-    MouseArea{
-        anchors.fill: parent;
-        onClicked: (mouse) =>{
-            root.hidePopout();
-        }
-        onExited: () => {
-            root.hidePopout();
-        }
-        hoverEnabled: true;
-    }
     signal hidePopout()
     onHidePopout: {
         //swap to popout region when closing window to restore imediate mouse clicks.
@@ -65,49 +55,60 @@ PopupWindow{
             mask = regionTop;
         }
     }
-    Components.StackingCanvas{
-        id: stack
-        x: {
-            switch(root.windowGravity){
-                case "left":
+    MouseArea{
+        anchors.fill: parent;
+        propagateComposedEvents: true;
+        onClicked: (mouse) =>{
+            root.hidePopout();
+        }
+        onExited: () => {
+            root.hidePopout();
+        }
+        hoverEnabled: true;
+        Components.StackingCanvas{
+            id: stack
+            x: {
+                switch(root.windowGravity){
+                    case "left":
                     return root.width - root.popoutX - targetWidth + padding;
-                case "bottom":
+                    case "bottom":
                     return root.popoutX - targetWidth /2 + root.width/2 + (root.popoutX > 10 ? -padding : (root.popoutX < -10 ? padding : 0));
+                }
+                return root.popoutX - padding;
+
             }
-            return root.popoutX - padding;
+            y: root.popoutY;
+            color: Components.Colour.bg;
+            borderColor: Components.Colour.accent;
 
-        }
-        y: root.popoutY;
-        color: Components.Colour.bg;
-        borderColor: Components.Colour.accent;
-         
-        cornerSize: 20;
-        padding: 10;
-        borderSize: 2;
+            cornerSize: 20;
+            padding: 10;
+            borderSize: 2;
 
-        duration: 400;
-        property real targetWidth: width;
-        property real targetHeight: height;
-        onSetWidth: (value) => {
-            targetWidth = value;
-        }
-        onSetHeight: (value) => {
-            targetHeight= value;
-        }
+            duration: 400;
+            property real targetWidth: width;
+            property real targetHeight: height;
+            onSetWidth: (value) => {
+                targetWidth = value;
+            }
+            onSetHeight: (value) => {
+                targetHeight= value;
+            }
 
-        currentIndex: root.currentPopout;
+            currentIndex: root.currentPopout;
 
-        onDeselect: {
-            root.changeVisibility(false);
-        }
-        onSelect: {
-            root.changeVisibility(true);
-        }
+            onDeselect: {
+                root.changeVisibility(false);
+            }
+            onSelect: {
+                root.changeVisibility(true);
+            }
 
-        onCurrentIndexChanged: {
-            if(currentIndex == -1){
-                height = 60;
-                root.changePos(root.popoutX, -60)
+            onCurrentIndexChanged: {
+                if(currentIndex == -1){
+                    height = 60;
+                    root.changePos(root.popoutX, -60)
+                }
             }
         }
     }
