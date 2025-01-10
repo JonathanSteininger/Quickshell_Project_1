@@ -107,20 +107,45 @@ ButtonStrip{
         //do this to hide the repeater as a child. uwu --very ugly - pretty much setting width = 0;
         width: -parent.spacing;
     }
-    Text{
-        id: volume
-        property real volume: GlobalState.defaultAudio.audio.volume;
-        text: `${Math.floor(this.volume*100)}%`;
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
+    Rectangle{
+        width: childrenRect.width + 20;
+        height: childrenRect.height;
+        color: Colour.trans;
         signal clicked();
         onClicked: () => {
             GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
         }
-        //onTextChanged: parent._update();
-        onTextChanged: () => {
-            parent._update();
+        Text{
+            id: volume
+            horizontalAlignment: Text.AlignRight;
+            property real volume: GlobalState.defaultAudio.audio.volume;
+            width: 60;
+            text: `${Math.floor(this.volume*100)}%`;
+            color: Colour.fg;
+            font.family: "Iosevka";
+            font.pointSize: 14;
+            //onTextChanged: parent._update();
+            onTextChanged: () => {
+                parent._update();
+            }
+        }
+        Text{
+            x: 5;
+            color: Colour.fg;
+            text: getIcon();
+            function getIcon(){
+                if(GlobalState.defaultAudio == null){
+                    return "?";
+                }
+                if(GlobalState.defaultAudio.audio.muted){
+                    return "M"
+                }
+                if(GlobalState.defaultAudio.audio.volume > 0.8){
+                    return "H"
+                }
+                return "L"
+
+            }
         }
     }
     Text{
