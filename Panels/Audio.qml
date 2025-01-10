@@ -245,9 +245,6 @@ Rectangle{
                 SoundTile{
                     width: frame.width;
                     audioNode: audio;
-                    Component.onCompleted: {
-                        console.log(name);
-                    }
                     nodeName: name;
                     nodeId: id;
                     nodeTitle: nodeName;
@@ -287,8 +284,10 @@ Rectangle{
             model: Pipewire.nodes.values;
             groups: [
                 DelegateModelGroup {
+                    id: outputItems;
                     includeByDefault: false;
-                    name: "outputDevice" }
+                    name: "outputDevice" ;
+                }
             ]
 
             filterOnGroup: "outputDevice";
@@ -300,9 +299,6 @@ Rectangle{
                 SoundTile{
                     width: frame.width;
                     audioNode: audio;
-                    Component.onCompleted: {
-                        console.log(name);
-                    }
                     nodeName: name;
                     nodeId: id;
                     nodeTitle: description;
@@ -327,14 +323,31 @@ Rectangle{
             Component.onCompleted:{
                 filter();
             }
-
+            property var lessThan: function(left, right) { return left < right; }
             function filter(){
+                if(items.count > 0){
+                    items.setGroups(0, items.count, "items");
+                }
+                var list = [];
                 for( var i = 0; i < items.count;i++ ) {  
                     var entry = items.get(i);  
                     if(entry.model.isSink && !entry.model.isStream) {  
-                        entry.inOutputDevice = true;
+                        list.push(entry);
                     }  
                 }
+                // Step 2: Sort the list of visible items
+                list.sort(function(a, b) {
+                    return lessThan(a.model.description, b.model.description) ? -1 : 1;
+                });
+
+                for(var i = 0; i < list.length; ++i) {
+                    entry = list[i];
+                    entry.inOutputDevice = true;
+                    if (entry.outputDeviceIndex !== i) {
+                        outputItems.move(entry.outputDeviceIndex, i, 1);
+                    }
+                }
+
             }
         }
 

@@ -43,8 +43,7 @@ Singleton {
     property point middlePos: Qt.point(0, -80);
 
     property list<string> middleMap:[
-        "audio",
-        "time"
+        "player"
     ]
 
 
@@ -85,7 +84,20 @@ Singleton {
     }
     Component.onCompleted: {
         Pipewire.nodes.objectInsertedPost.connect(updateTrackers);
+        Pipewire.nodes.objectRemovedPre.connect(removeNode);
         updateTrackers();
+    }
+    function removeNode(object, index){
+        if(object == null){
+            console.log("Removed object was null??");
+            return;
+        }
+
+        var index = objectTracker.objects.findIndex((node) => {
+            if(node == null) return false;
+            return node.name == object.name && node.id == object.id;
+        })
+        objectTracker.objects[index] = null;
     }
     function compareNodes(a: PwNode, b:PwNode):bool {
         if(a == null) return false;
