@@ -84,8 +84,8 @@ Singleton {
         }
     }
     Component.onCompleted: {
+        Pipewire.nodes.objectInsertedPost.connect(updateTrackers);
         updateTrackers();
-        Pipewire.nodes.onValuesChanged.connect(updateTrackers);
     }
     function compareNodes(a: PwNode, b:PwNode):bool {
         if(a == null) return false;
@@ -94,20 +94,16 @@ Singleton {
     }
     //put checks for things you want to track here. will automatically grab those nodes
     function updateTrackers(){
-        console.log("amountofNodes:", Pipewire.nodes.values.length);
         Pipewire.nodes.values.forEach((node) => {
             if(node.isSink && !node.isStream && node.audio){
                 saveNode(node);
             } else if(!node.isSink && node.isStream && node.audio){
-                console.log(node.name, node.audio.channels.length);
-                console.log(node.name, node.properties["volume"]);
                 saveNode(node);
             }
         })
     }
     function setNodeDefault(name: string, id: int){
         var obj = objectTracker.objects.find((node) => {
-            console.log(node);
             if(node == null) return false;
             return node.name == name && node.id == id;
         }
