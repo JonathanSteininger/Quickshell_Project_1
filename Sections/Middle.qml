@@ -18,7 +18,7 @@ CenterButtonStrip{
         text: "rectangle"
         signal clicked()
         onClicked: () => {
-            GlobalState.popupMiddle("audio", root.convertPopoutPosition(x, width));
+            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
         }
     }
     Text{
@@ -26,10 +26,10 @@ CenterButtonStrip{
         color: Colour.fg
         width: 120
         horizontalAlignment: Text.AlignHCenter;
-        text: "rectangle"
+        text: "Nothing Playing"
         signal clicked()
         onClicked: () => {
-            GlobalState.popupMiddle("time", root.convertPopoutPosition(x, width));
+            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
         }
     }
     Text{
@@ -37,7 +37,7 @@ CenterButtonStrip{
         text: "rectangle"
         signal clicked()
         onClicked: () => {
-            GlobalState.popupMiddle("audio", root.convertPopoutPosition(x, width));
+            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
         }
     }
 

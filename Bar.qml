@@ -76,8 +76,7 @@ Scope {
             Components.GlobalState.middlePos.y = y;
         }
         anchor.rect.y: -6;
-        Panels.Audio {}
-        Panels.Time {}
+        Panels.Player{}
     }
 
     Panels.PopoutPanel{
