@@ -124,10 +124,6 @@ ButtonStrip{
             color: Colour.fg;
             font.family: "Iosevka";
             font.pointSize: 14;
-            //onTextChanged: parent._update();
-            onTextChanged: () => {
-                parent._update();
-            }
         }
         Text{
             x: 5;
