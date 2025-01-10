@@ -24,33 +24,6 @@ ButtonStrip{
     property var componentFactory: Qt.createComponent("../Dynamic/WorkspaceSection.qml");
 
     Text{
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        horizontalAlignment: Text.AlignHCenter;
-        text: "1!";
-        signal clicked();
-        onClicked: () => GlobalState.popupLeft("audio", x);
-    }
-    Text{
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        horizontalAlignment: Text.AlignHCenter;
-        text: "2!";
-        signal clicked();
-        onClicked: () => GlobalState.popupLeft("time", x);
-    }
-    Text{
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        horizontalAlignment: Text.AlignHCenter;
-        text: "3!";
-        signal clicked();
-        onClicked: () => GlobalState.popupLeft(2, x);
-    }
-    Text{
         id: timer;
         color: Colour.fg;
         width: 120;
@@ -58,7 +31,7 @@ ButtonStrip{
         font.pointSize: 14;
         horizontalAlignment: Text.AlignHCenter;
         signal clicked();
-        onClicked: () => GlobalState.popupLeft("time", null);
+        onClicked: () => GlobalState.popupLeft("time", x);
         Process {
             id: dateProc;
             command: ["date", "+%r"];
