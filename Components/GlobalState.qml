@@ -71,6 +71,7 @@ Singleton {
 
     //tracks default audio.
     readonly property PwNode defaultAudio: Pipewire.defaultAudioSink;
+
     onDefaultAudioChanged: {
         objectTracker.objects.pop();
         objectTracker.objects.push(defaultAudio);
@@ -87,6 +88,8 @@ Singleton {
         Pipewire.nodes.onValuesChanged.connect(updateTrackers);
     }
     function compareNodes(a: PwNode, b:PwNode):bool {
+        if(a == null) return false;
+        if(b == null) return false;
         return a.id == b.id && a.name == b.name;
     }
     //put checks for things you want to track here. will automatically grab those nodes
@@ -101,6 +104,21 @@ Singleton {
                 saveNode(node);
             }
         })
+    }
+    function setNodeDefault(name: string, id: int){
+        var obj = objectTracker.objects.find((node) => {
+            console.log(node);
+            if(node == null) return false;
+            return node.name == name && node.id == id;
+        }
+        );
+        if (obj == null || obj == undefined){
+            console.log("failed to set default audio node. not found", name, id);
+            updateTrackers();
+            return;
+        }
+        Pipewire.preferredDefaultAudioSink = obj;
+        updateTrackers();
     }
     function saveNode(node: PwNode): void{
         if(!objectTracker.objects.some((child) => compareNodes(child, node))){
