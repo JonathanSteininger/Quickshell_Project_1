@@ -197,6 +197,11 @@ Rectangle{
                 radius: 3;
                 anchors.bottom: parent.bottom;
                 anchors.right: parent.right;
+                Behavior on color{
+                    ColorAnimation {
+                        duration: 100;
+                    }
+                }
                 MouseArea{
                     anchors.fill: parent;
                     hoverEnabled: true;
