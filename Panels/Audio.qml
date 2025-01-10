@@ -325,9 +325,11 @@ Rectangle{
             }
             property var lessThan: function(left, right) { return left < right; }
             function filter(){
+                /*
                 if(items.count > 0){
                     items.setGroups(0, items.count, "items");
                 }
+                */
                 var list = [];
                 for( var i = 0; i < items.count;i++ ) {  
                     var entry = items.get(i);  
