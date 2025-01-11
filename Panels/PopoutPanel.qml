@@ -80,11 +80,9 @@ PopupWindow{
             y: root.popoutY;
             color: Components.Colour.bg;
             borderColor: Components.Colour.accent;
-
             cornerSize: 20;
             padding: 10;
             borderSize: 2;
-
             duration: 400;
             property real targetWidth: width;
             property real targetHeight: height;
@@ -106,7 +104,7 @@ PopupWindow{
 
             onCurrentIndexChanged: {
                 if(currentIndex == -1){
-                    height = 60;
+                    innerHeight = 60 - padding*2;
                     root.changePos(root.popoutX, -60)
                 }
             }

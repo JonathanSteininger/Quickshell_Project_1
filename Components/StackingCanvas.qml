@@ -16,6 +16,8 @@ Shape{
     property alias internalClip: childContainer.clip;
 
     property alias currentIndex: childContainer.childIndex;
+    property alias innerHeight: childContainer.height;
+    property alias innerWidth: childContainer.width;
 
     property var currentObject: () => {
         if(currentIndex < 0 || currentIndex >= childContainer.children.length)
@@ -75,12 +77,8 @@ Shape{
 
     signal setWidth(value: real)
     signal setHeight(value: real)
-    onSetWidth: (value) => {
-        width = value;
-    }
-    onSetHeight: (value) => {
-        height = value;
-    }
+    width: childContainer.width + padding*2;
+    height: childContainer.height + padding*2;
 
     Item{
         id: childContainer;
@@ -154,16 +152,38 @@ Shape{
         }
 
         function swapSize():void{
+            swapSizefr();
+        }
+        function swapSizefr(){
+            if(childIndex < 0 || childIndex >= children.length){
+                return;
+            }
+            updateHeight();
+            updateWidth();
+        }
+        function updateHeight(){
+            if(childIndex < 0 || childIndex >= children.length){
+                return;
+            }
+            setHeight(children[childIndex].height);
+        }
+        function updateWidth(){
             if(childIndex < 0 || childIndex >= children.length){
                 return;
             }
             setWidth(children[childIndex].width);
-            setHeight(children[childIndex].height);
         }
 
         function swap():void {
             for(var i = 0; i < children.length; i++){
                 children[i].visible = childIndex == i;
+                if(childIndex == i){
+                    children[childIndex].onHeightChanged.connect(updateHeight);
+                    children[childIndex].onWidthChanged.connect(updateWidth);
+                }else{
+                    children[childIndex].onHeightChanged.disconnect(updateHeight);
+                    children[childIndex].onWidthChanged.disconnect(updateWidth);
+                }
             }
         }
         Component.onCompleted: {
