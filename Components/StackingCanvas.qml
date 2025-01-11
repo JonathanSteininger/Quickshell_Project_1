@@ -188,11 +188,11 @@ Shape{
                 for(var i = 0; i < children.length; i++){
                     children[i].visible = childIndex == i;
                     if(childIndex == i){
-                        children[childIndex].onHeightChanged.connect(updateHeight);
-                        children[childIndex].onWidthChanged.connect(updateWidth);
+                        children[i].onHeightChanged.connect(updateHeight);
+                        children[i].onWidthChanged.connect(updateWidth);
                     }else{
-                        children[childIndex].onHeightChanged.disconnect(updateHeight);
-                        children[childIndex].onWidthChanged.disconnect(updateWidth);
+                        children[i].onHeightChanged.disconnect(updateHeight);
+                        children[i].onWidthChanged.disconnect(updateWidth);
                     }
                 }
             }
