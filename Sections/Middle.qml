@@ -15,29 +15,35 @@ CenterButtonStrip{
     tiltRight: false
     Text{
         color: Colour.fg
-        text: "rectangle"
+        text: "<<"
         signal clicked()
         onClicked: () => {
-            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            //GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            GlobalState.previousPlayer();
         }
     }
     Text{
         property bool center: true;
         color: Colour.fg
-        width: 120
-        horizontalAlignment: Text.AlignHCenter;
-        text: "Nothing Playing"
+        horizontalAlignment: Text.AlignLeft;
+        text: GlobalState.activePlayerActual.trackTitle;
+        width: Math.min(implicitWidth, 400);
+        clip: true;
         signal clicked()
         onClicked: () => {
             GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
         }
+        onTextChanged: () => {
+            root._update();
+        }
     }
     Text{
         color: Colour.fg
-        text: "rectangle"
+        text: ">>"
         signal clicked()
         onClicked: () => {
-            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            //GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            GlobalState.nextPlayer();
         }
     }
 
