@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell 
 import QtQuick
 import Quickshell.Services.Pipewire
+import Quickshell.Services.Mpris
 
 Singleton {
     property int popupOffset: 8;
@@ -82,11 +83,6 @@ Singleton {
             objects.push(...Pipewire.nodes.values)
         }
     }
-    Component.onCompleted: {
-        Pipewire.nodes.objectInsertedPost.connect(updateTrackers);
-        Pipewire.nodes.objectRemovedPre.connect(removeNode);
-        updateTrackers();
-    }
     function removeNode(object, index){
         if(object == null){
             console.log("Removed object was null??");
@@ -122,15 +118,49 @@ Singleton {
         );
         if (obj == null || obj == undefined){
             console.log("failed to set default audio node. not found", name, id);
-            updateTrackers();
             return;
         }
         Pipewire.preferredDefaultAudioSink = obj;
-        updateTrackers();
     }
     function saveNode(node: PwNode): void{
         if(!objectTracker.objects.some((child) => compareNodes(child, node))){
             objectTracker.objects.push(node);
         }
+    }
+
+
+
+    property int activePlayer: 0;
+    property var players: Mpris.players;
+    property var activePlayerActual: players.values[activePlayer];
+    readonly property int playerAmount: Mpris.players.values.length;
+
+    Component.onCompleted: {
+        Pipewire.nodes.objectInsertedPost.connect(updateTrackers);
+        Pipewire.nodes.objectRemovedPre.connect(removeNode);
+        updateTrackers();
+        Mpris.players.objectRemovedPost.connect(validatePlayerIndex);
+        Mpris.players.objectInsertedPost.connect(validatePlayerIndex);
+    }
+    function validatePlayerIndex(object, index){
+        if(activePlayer >= playerAmount){
+            activePlayer = playerAmount-1;
+            return;
+        }
+        if(activePlayer < 0){
+            activePlayer = 0;
+        }
+    }
+    function nextPlayer(){
+        if(activePlayer >= playerAmount -1){
+            return;
+        }
+        activePlayer++;
+    }
+    function previousPlayer(){
+        if(activePlayer <= 0){
+            return;
+        }
+        activePlayer--;
     }
 }
