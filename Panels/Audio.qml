@@ -70,123 +70,30 @@ Rectangle{
                 wrapMode: Text.WordWrap;
                 text: item.nodeTitle;
             }
-            Rectangle{
-                implicitWidth: 30;
-                implicitHeight: 20;
-                radius: 5;
-                y: slider.y - height;
-                x: slider.handle.x - slider.handle.width/2;
-                color: item.activeBackgroundColor;
-                visible: slider.pressed;
-                Text {
-                    anchors.centerIn: parent;
-                    font.pointSize: 10;
-                    color: item.activeTextColor;
-                    font.family: item.fontFamily;
-                    text: `${Math.round(audioNode.volume * 1000)/10}%`;
-                }
-            }
-            Slider{
+            Components.Slider{
                 id: slider;
+                textColor: item.activeTextColor;
+                barColor: item.activeColor;
                 width: parent.width;
-                from: 0;
-                value: audioNode.volume;
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.horizontalCenter: parent.horizontalCenter;
-                to: 1.5;
-                snapMode: Slider.SnapAlways;
+                backgroundColor: item.activeBackgroundColor;
+                emptyColor: item.activeSliderColor;
+                overShootColor: item.activeSecondaryColor;
+                overShootLocation: 1.0;
                 stepSize: 0.05;
+                value: item.audioNode.volume;
+                from: 0;
+                to: 1.5;
+                textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
+                textRight: "";
+                textPressed: `${Math.round(value * 1000)/10}%`;
+                font: "Iosevka";
+                textSizeBottom: 12;
+                textSizePressed: 10;
                 onMoved: {
-                    audioNode.volume = value;
+                    item.audioNode.volume = value;
                 }
-                background: Rectangle{
-                    x: slider.leftPaddingChanged;
-                    y: slider.topPadding + slider.availableHeight /2 - height /2;
-                    implicitHeight: 5;
-                    implicitWidth: 200;
-                    width: slider.availableWidth;
-                    height: slider.availableHeight;
-                    radius: 5;
-                    color: Components.Colour.trans;
-                    Rectangle{
-                        height: parent.height;
-                        width: parent.width /3 * 2;
-                        x: 0;
-                        color: item.activeSliderColor;
-                        bottomLeftRadius: parent.radius;
-                        topLeftRadius: parent.radius;
-                    }
-                    Rectangle{
-                        height: parent.height;
-                        property real shift: 0.2;
-                        width: parent.width /3 * (1 + shift) - slider.handle.width/2;
-                        x: parent.width /3 * (2 - shift) + slider.handle.width/2;
-                        gradient: Gradient{
-                            orientation: Gradient.Horizontal;
-                            GradientStop{ position: 0.0; color: item.activeSliderColor}
-                            GradientStop{ position: 0.4; color: item.activeSecondaryColor}
-                            GradientStop{ position: 1.0; color: item.activeSecondaryColor}
-                        }
-                        bottomRightRadius: parent.radius;
-                        topRightRadius: parent.radius;
-                    }
-                    Rectangle{
-                        height: parent.height;
-                        width: slider.handle.x + slider.handle.width/2;
-                        x: 0;
-                        color: item.activeColor;
-                        bottomLeftRadius: parent.radius;
-                        topLeftRadius: parent.radius;
-                    }
-                    Rectangle{
-                        height: parent.height;
-                        width: parent.width;
-                        x: 0;
-                        border.width: 1;
-                        border.color: item.activeColor;
-                        color: Components.Colour.trans;
-                        radius: parent.radius;
-                    }
-                    Repeater{
-                        id: lines;
-                        property int steps: (slider.to - slider.from) / slider.stepSize;
-                        model: steps + 1;
-                        Rectangle{
-                            required property int index;
-                            property int extra: index % Math.round(lines.steps/3*2) == 0? 3 : 0;
-                            property int selectedExtra: 5;
-                            width: 2;
-                            implicitHeight: index % 5 == 0 ? 8: 5;
-                            height: (Math.round(lines.steps*slider.position) == index ? implicitHeight + selectedExtra : implicitHeight) + extra;
-                            color: Math.round(lines.steps*slider.position) >= index ? item.activeColor : item.activeSecondaryColor;
-                            LineBehavior on color{}
-                            LineBehavior on height{}
-                            x: (parent.width - slider.handle.width) / lines.steps * index + slider.handle.width/2;
-                            y: parent.y + parent.height + 3;
-                        }
-                    }
-
-                }
-                handle: Rectangle{
-                    implicitWidth: 10;
-                    implicitHeight: 10;
-                    color: item.activeColor;
-                    border.width: 1;
-                    border.color: item.activeSliderColor;
-                    height: implicitHeight + 4;
-                    width: implicitWidth + 4;
-                    anchors.verticalCenter: slider.verticalCenter;
-                    radius: 10;
-                    x: (slider.width - width) * slider.position + 0.5;
-
-                }
-            }
-
-            Text {
-                anchors.bottom: parent.bottom;
-                color: item.activeTextColor;
-                font.family: item.fontFamily;
-                text: `${Math.round(audioNode.volume * 1000)/10}%`;
             }
             Rectangle{
                 width: 50;
