@@ -153,12 +153,14 @@ Singleton {
     }
     function nextPlayer(){
         if(activePlayer >= playerAmount -1){
+            activePlayer = 0;
             return;
         }
         activePlayer++;
     }
     function previousPlayer(){
         if(activePlayer <= 0){
+            activePlayer = players.values.length-1;
             return;
         }
         activePlayer--;
