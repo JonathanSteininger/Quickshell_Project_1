@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -11,10 +12,16 @@ pragma ComponentBehavior: Bound
 Rectangle{
     id: root;
     width: 450;
-    height: childrenRect.height;
+    height: playerTile.height + playerSelector.height;
     MouseArea{
         width: root.width;
         height: root.height;
+    }
+    component LineBehavior: Behavior{
+        PropertyAnimation{
+            duration: 200;
+            easing.type: Easing.InOutQuad;
+        }
     }
     component StyledButton: Rectangle{
         width: 70;
@@ -25,6 +32,8 @@ Rectangle{
         required property bool filled;
         property string activeColor: filled ? boxColor : "#00000000";
         required property string text;
+        property alias hoverEnabled: mouseBox.hoverEnabled;
+        property string fontFamily: "Iosevka";
         border.color: mouseBox.containsMouse ? clickColor : boxColor;
         border.width: 2;
         color: mouseBox.containsMouse ? clickColor : activeColor;
@@ -195,25 +204,109 @@ Rectangle{
                         text: player.model.trackArtist || "Unknown Artist"
                         font.pointSize: 10;
                     }
-                    Slider{
+                    Components.Slider{
+                        id: progressBar;
+                        textColor: player.textColor;
+                        barColor: player.boxColor;
+                        width: parent.width;
+                        backgroundColor: player.backgroundColor;
+                        emptyColor: player.emptyBarColor;
+                        overShootColor: player.emptyBarColor;
+                        overShootLocation: 1.0;
+                        stepSize: 0;
                         from: 0;
                         value: player.model.position;
                         to: player.model.length;
+                        textLeft: player.formatTime(player.model.position);
+                        textRight: player.formatTime(player.model.length);
+                        textPressed: player.formatTime(value);
+                        font: "Iosevka";
+                        textSizeBottom: 12;
+                        textSizePressed: 10;
                         onMoved: {
-                            console.log(player.model.length, player.model.position);
-                            console.log(from, to);
+                            if(!player.model.canSeek){
+                                console.log("CANT SEEK");
+                                value = player.model.position;
+                                return;
+                            }
                             player.model.position = value;
-                            //value = player.model.position;
+                        }
+                        //Components.
+                        Process{
+                            id: mpdSeekProc;
+                            property string seekPos: "00:00:00";
+                            property string playerLocation: "";
+                            running: false;
+                            command: ["mpc", "-h", playerLocation, "seek", seekPos];
+                            stderr: SplitParser{
+                                onRead: (value) => console.log(value);
+                            }
+                            stdout: SplitParser{
+                                onRead: (value) => console.log(value);
+                            }
+                        }
+                    }
+                    Rectangle{
+                        id: controls;
+                        color: Components.Colour.trans;
+                        property real padding: 10;
+                        width: parent.width;
+                        height: controlRow.height + padding*2;
+                        RowLayout{
+                            id: controlRow;
+                            anchors.centerIn: controls;
+                            StyledButton{
+                                filled: false;
+                                hoverEnabled: true;
+                                textColor: player.textColor;
+                                boxColor: player.boxColor;
+                                clickColor: player.activeColor;
+                                width: 80;
+                                height: 40;
+                                text: "Prev"
+                                onClicked:{
+                                    player.model.previous();
+                                }
+                            }
+                            StyledButton{
+                                filled: false;
+                                hoverEnabled: true;
+                                textColor: player.textColor;
+                                boxColor: player.boxColor;
+                                clickColor: player.activeColor;
+                                width: 80;
+                                height: 40;
+                                text: player.model.isPlaying ? "Pause" : "Playing";
+                                onClicked:{
+                                    if(player.model.isPlaying){
+                                        player.model.pause();
+                                    }else{
+                                        player.model.play();
+                                    }
+                                }
+                            }
+                            StyledButton{
+                                filled: false;
+                                hoverEnabled: true;
+                                textColor: player.textColor;
+                                boxColor: player.boxColor;
+                                clickColor: player.activeColor;
+                                width: 80;
+                                height: 40;
+                                text: "Prev"
+                                onClicked:{
+                                    player.model.next();
+                                }
+                            }
                         }
                     }
                 }
-
-                Rectangle{
-                    id: volumeControls;
-                    height: 50;
-                    Layout.fillWidth: true;
-                    color: "red";
-                }
+            }
+            Timer{
+                running: player.visible;
+                repeat: true;
+                onTriggered: player.model.positionChanged();
+                interval: 1000;
             }
         }
 
@@ -225,8 +318,60 @@ Rectangle{
         height: 50;
         width: root.width;
         color: "red";
+        StyledButton{
+            id: prevPlayerButton;
+            filled: false;
+            hoverEnabled: true;
+            anchors.verticalCenter: parent.verticalCenter;
+            textColor: Components.Colour.fg;
+            boxColor: Components.Colour.accent;
+            clickColor: Components.Colour._active;
+            width: 80;
+            height: 40;
+            text: "Prev"
+            onClicked:{
+                Components.GlobalState.previousPlayer();
+            }
+        }
+        Rectangle{
+            id: repeaterThing;
+            property int amount: Components.GlobalState.players.values.length;
+            anchors.left: prevPlayerButton.right;
+            anchors.right: nextPlayerButton.left;
+            height: parent.height;
+            color: "blue";
+            Repeater{
+                model: repeaterThing.amount;
+                Rectangle{
+                    required property int index;
+                    Layout.alignment: Qt.AlignCenter;
+                    anchors.verticalCenter: repeaterThing.verticalCenter;
+                    width: 5;
+                    x: repeaterThing.width / repeaterThing.amount * index + (repeaterThing.width / repeaterThing.amount)/2;
+                    height: index == Components.GlobalState.activePlayer ? 40 : 20;
+                    LineBehavior on height{}
+                }
+            }
+        }
+        StyledButton{
+            id: nextPlayerButton;
+            filled: false;
+            hoverEnabled: true;
+            anchors.right: parent.right;
+            anchors.verticalCenter: parent.verticalCenter;
+            textColor: Components.Colour.fg;
+            boxColor: Components.Colour.accent;
+            clickColor: Components.Colour._active;
+            width: 80;
+            height: 40;
+            text: "Next"
+            onClicked:{
+                Components.GlobalState.nextPlayer();
+            }
+        }
     }
     PlayerTile{
+        id: playerTile;
         y: Components.GlobalState.players.values.length > 1 ? playerSelector.height : 0;
         model: Components.GlobalState.activePlayerActual;
         textColor: Components.Colour.fg;
