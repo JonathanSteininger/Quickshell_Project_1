@@ -346,10 +346,13 @@ Rectangle{
                     required property int index;
                     Layout.alignment: Qt.AlignCenter;
                     anchors.verticalCenter: repeaterThing.verticalCenter;
-                    width: 5;
-                    x: repeaterThing.width / repeaterThing.amount * index + (repeaterThing.width / repeaterThing.amount)/2;
+                    property real tempWidth:index == Components.GlobalState.activePlayer ? 5 : 20; 
+                    x: repeaterThing.width / repeaterThing.amount * index + (repeaterThing.width / repeaterThing.amount)/2 - tempWidth/2;
                     height: index == Components.GlobalState.activePlayer ? 40 : 20;
+                    width: tempWidth;
                     LineBehavior on height{}
+                    LineBehavior on width{}
+                    LineBehavior on x{}
                 }
             }
         }
