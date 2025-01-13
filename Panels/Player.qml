@@ -301,6 +301,35 @@ Rectangle{
                         }
                     }
                 }
+                Components.Slider{
+                    width: parent.width * 0.8;
+                    Layout.alignment: Qt.AlignCenter;
+                    height: 50;
+                    id: volumeBar;
+                    textColor: player.textColor;
+                    barColor: player.boxColor;
+                    backgroundColor: player.backgroundColor;
+                    emptyColor: player.emptyBarColor;
+                    overShootColor: Components.Colour._active2;
+                    overShootLocation: 1.0;
+                    stepSize: 0.05;
+                    from: 0.0;
+                    value: player.model.volume;
+                    to: 1.5;
+                    textLeft: player.model.volume;
+                    textRight: "";
+                    textPressed: value;
+                    font: "Iosevka";
+                    textSizeBottom: 12;
+                    textSizePressed: 10;
+                    onMoved: {
+                        if(!player.model.volumeSupported){
+                            value = player.model.volume;
+                            return;
+                        }
+                        player.model.volume = value;
+                    }
+                }
             }
             Timer{
                 running: player.visible;
@@ -316,8 +345,9 @@ Rectangle{
         id: playerSelector;
         visible: Components.GlobalState.players.values.length > 1;
         height: 50;
-        width: root.width;
-        color: "red";
+        width: root.width * 0.8;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        color: Components.Colour.trans;
         StyledButton{
             id: prevPlayerButton;
             filled: false;
@@ -339,20 +369,23 @@ Rectangle{
             anchors.left: prevPlayerButton.right;
             anchors.right: nextPlayerButton.left;
             height: parent.height;
-            color: "blue";
+            color: Components.Colour.trans;
             Repeater{
                 model: repeaterThing.amount;
                 Rectangle{
                     required property int index;
                     Layout.alignment: Qt.AlignCenter;
                     anchors.verticalCenter: repeaterThing.verticalCenter;
-                    property real tempWidth:index == Components.GlobalState.activePlayer ? 5 : 20; 
+                    property real tempWidth:index == Components.GlobalState.activePlayer ? 5 : 15; 
                     x: repeaterThing.width / repeaterThing.amount * index + (repeaterThing.width / repeaterThing.amount)/2 - tempWidth/2;
-                    height: index == Components.GlobalState.activePlayer ? 40 : 20;
+                    height: index == Components.GlobalState.activePlayer ? 40 : 15;
                     width: tempWidth;
+                    radius: 100;
+                    color: index != Components.GlobalState.activePlayer ? Components.Colour.accent : Components.Colour._active;
                     LineBehavior on height{}
                     LineBehavior on width{}
                     LineBehavior on x{}
+                    LineBehavior on color{}
                 }
             }
         }
