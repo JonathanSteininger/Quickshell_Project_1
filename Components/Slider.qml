@@ -24,6 +24,7 @@ Rectangle{
     required property string font;
     required property real textSizeBottom;
     required property real textSizePressed;
+    property bool disableBars: false;
     component LineBehavior: Behavior{
         PropertyAnimation{
             duration: 200;
@@ -108,7 +109,7 @@ Rectangle{
             Repeater{
                 id: lines;
                 property int steps: (slider.to - slider.from) / slider.stepSize;
-                model: root.stepSize == 0 ? 0 : (steps + 1);
+                model: root.stepSize == 0 || disableBars ? 0 : (steps + 1);
                 Rectangle{
                     required property int index;
                     property int extra: index % Math.round(lines.steps/3*2) == 0? 3 : 0;

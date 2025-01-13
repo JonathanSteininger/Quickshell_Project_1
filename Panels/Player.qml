@@ -213,8 +213,9 @@ Rectangle{
                         emptyColor: player.emptyBarColor;
                         overShootColor: player.emptyBarColor;
                         overShootLocation: 1.0;
-                        stepSize: 0;
+                        stepSize: 1;
                         from: 0;
+                        disableBars: true;
                         value: player.model.position;
                         to: player.model.length;
                         textLeft: player.formatTime(player.model.position);
