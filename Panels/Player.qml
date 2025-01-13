@@ -305,6 +305,7 @@ Rectangle{
                     width: parent.width * 0.8;
                     Layout.alignment: Qt.AlignCenter;
                     height: 50;
+                    visible: player.model.volumeSupported;
                     id: volumeBar;
                     textColor: player.textColor;
                     barColor: player.boxColor;
