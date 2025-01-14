@@ -12,7 +12,7 @@ pragma ComponentBehavior: Bound
 Rectangle{
     id: root;
     width: 450;
-    height: playerTile.height + playerSelector.height;
+    height: playerSelector.visible ? playerTile.height + playerSelector.height : playerTile.height;
     MouseArea{
         width: root.width;
         height: root.height;
