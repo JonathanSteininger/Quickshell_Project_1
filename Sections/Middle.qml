@@ -13,37 +13,25 @@ CenterButtonStrip{
     borderSize: 0.6;
     color: Colour.bg;
     tiltRight: false
-    Text{
-        color: Colour.fg
-        text: "<<"
-        signal clicked()
-        onClicked: () => {
-            //GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            GlobalState.previousPlayer();
+    Rectangle{
+        width: Math.max(childrenRect.width, 200);
+        height: childrenRect.height;
+        color: Colour.trans;
+        Text{
+            property bool center: true;
+            color: Colour.fg
+            anchors.horizontalCenter: parent.horizontalCenter;
+            horizontalAlignment: Text.AlignLeft;
+            text: GlobalState.activePlayerActual.trackTitle;
+            width: Math.min(implicitWidth, 400);
+            clip: true;
+            onTextChanged: () => {
+                root._update();
+            }
         }
-    }
-    Text{
-        property bool center: true;
-        color: Colour.fg
-        horizontalAlignment: Text.AlignLeft;
-        text: GlobalState.activePlayerActual.trackTitle;
-        width: Math.min(implicitWidth, 400);
-        clip: true;
         signal clicked()
         onClicked: () => {
             GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-        }
-        onTextChanged: () => {
-            root._update();
-        }
-    }
-    Text{
-        color: Colour.fg
-        text: ">>"
-        signal clicked()
-        onClicked: () => {
-            //GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            GlobalState.nextPlayer();
         }
     }
 

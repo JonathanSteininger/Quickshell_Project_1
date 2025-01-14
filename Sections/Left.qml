@@ -11,10 +11,10 @@ ButtonStrip{
     id: leftPanel;
     anchors.left: parent.left;
     borderColor: Colour.accent;
-    borderSize: 0.6;
+    borderSize: 1;
     color: Colour.bg;
-    tiltRight: false
-    tiltStrength: 1
+    tiltRight: false;
+    tiltStrength: 1;
     implicitHeight: 50;
     //property string currentjson: "";
     property list<WorkspaceSection> workspaceSections: [];
@@ -23,32 +23,34 @@ ButtonStrip{
     //used to generate workspace sections.
     property var componentFactory: Qt.createComponent("../Dynamic/WorkspaceSection.qml");
 
-    Text{
-        id: timer;
-        color: Colour.fg;
-        width: 120;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        horizontalAlignment: Text.AlignHCenter;
-        signal clicked();
-        onClicked: () => GlobalState.popupLeft("time", x);
-        Process {
-            id: dateProc;
-            command: ["date", "+%r"];
-            running: true;
-            stdout: SplitParser {
-                onRead: data => timer.text = data;
+    innerChildren: [
+        Text{
+            id: timer;
+            color: Colour.fg;
+            width: 120;
+            font.family: "Iosevka";
+            font.pointSize: 14;
+            horizontalAlignment: Text.AlignHCenter;
+            signal clicked();
+            onClicked: () => GlobalState.popupLeft("time", x);
+            Process {
+                id: dateProc;
+                command: ["date", "+%r"];
+                running: true;
+                stdout: SplitParser {
+                    onRead: data => timer.text = data;
+                }
+            }
+            Timer{
+                interval: 1000;
+                running: true;
+                repeat: true;
+                onTriggered: {
+                    dateProc.running = true;
+                }
             }
         }
-        Timer{
-            interval: 1000;
-            running: true;
-            repeat: true;
-            onTriggered: {
-                dateProc.running = true;
-            }
-        }
-    }
+    ]
     function manageWorkspaces(event) {
         if(event.name == "workspacev2"){
             var data = event.data.split(",");
@@ -108,12 +110,11 @@ ButtonStrip{
     }
     function updateWorkspaces(commited = false){
         if(commited){
-            var firstWorkspaceIndex=children.findIndex((child) => child instanceof WorkspaceSection);
+            var firstWorkspaceIndex=innerChildren.findIndex((child) => child instanceof WorkspaceSection);
             if(firstWorkspaceIndex != -1){
-                children = children.slice(0, firstWorkspaceIndex);
+                innerChildren = innerChildren.slice(0, firstWorkspaceIndex);
             }
-            children.push(...workspaceSections);
-            _update();
+            innerChildren.push(...workspaceSections);
             workspaceSectionsGarbage = [];
         }else{
             redrawCommitment.running = true;

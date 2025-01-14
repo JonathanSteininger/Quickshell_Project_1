@@ -12,7 +12,7 @@ ButtonStrip{
     id: rightPanel;
     anchors.right: parent.right;
     borderColor: Colour.accent;
-    borderSize: 0.6;
+    borderSize: 1;
     color: Colour.bg;
     tiltRight: true;
     tiltStrength: 1
@@ -21,6 +21,7 @@ ButtonStrip{
     function convertPopoutPosition(_x, _width){
         return width - (_x + _width);
     }
+    innerChildren: [
     Text{
         text: " ";
         color: Colour.fg;
@@ -32,7 +33,7 @@ ButtonStrip{
         onClicked: () => console.log("open brightness");
         onWidthChanged: {
         }
-    }
+    },
     Text{
         text: "󰁆";
         color: Colour.fg;
@@ -44,7 +45,7 @@ ButtonStrip{
         onClicked: () => console.log("open brightness");
         onWidthChanged: {
         }
-    }
+    },
     Text{
         text: "󰁞";
         color: Colour.fg;
@@ -54,7 +55,7 @@ ButtonStrip{
         width: 30;
         onWidthChanged: {
         }
-    }
+    },
     Text{
         text: "";
         color: Colour.fg;
@@ -66,7 +67,7 @@ ButtonStrip{
         onClicked: () => console.log("open brightness");
         onWidthChanged: {
         }
-    }
+    },
     Text{
         text: " ";
         color: Colour.fg;
@@ -79,7 +80,7 @@ ButtonStrip{
             GlobalState.popupRight("time",rightPanel.convertPopoutPosition( x, width));
         }
 
-    }
+    },
     Repeater{
         model: SystemTray.items;
         Rectangle{
@@ -101,12 +102,10 @@ ButtonStrip{
                 source: image;
                 color: Colour.fg;
             }
-            Component.onCompleted: () => rightPanel._update();
-            onWidthChanged: () => rightPanel._update();
         }
         //do this to hide the repeater as a child. uwu --very ugly - pretty much setting width = 0;
         width: -parent.spacing;
-    }
+    },
     Rectangle{
         width: childrenRect.width + 20;
         height: childrenRect.height;
@@ -143,7 +142,7 @@ ButtonStrip{
 
             }
         }
-    }
+    },
     Text{
         id: battery
         text: "hello";
@@ -181,8 +180,7 @@ ButtonStrip{
                 }
             }
         }
-        onTextChanged: parent._update();
-    }
+    },
     Text{
         id: charging
         text: "hello";
@@ -226,6 +224,6 @@ ButtonStrip{
                 }
             }
         }
-        onTextChanged: parent._update();
     }
+]
 }

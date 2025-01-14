@@ -72,10 +72,11 @@ Shape{
         property int usedChildIndex: childIndex != -1 ? childIndex : previousChildIndex;
         property real childWidth: root.innerChildren[usedChildIndex].width;
         property real targetHeight: childIndex == -1 ? 0 : root.height;
+        property real shapeHeight: targetHeight
         //width: childWidth + root.spacing;
         x: root.innerChildren[usedChildIndex].x;
         width: childWidth + targetHeight+ root.spacing;
-        height: targetHeight;
+        height: root.height;
 
         Behavior on x{
             NumberAnimation {
@@ -89,7 +90,7 @@ Shape{
                 easing.type: Easing.OutExpo;
             }
         }
-        Behavior on height{
+        Behavior on shapeHeight{
             NumberAnimation {
                 duration: 200
                 easing.type: Easing.OutExpo;
@@ -98,6 +99,7 @@ Shape{
         readonly property real shift: height * root.tiltStrength;
         readonly property real shift1: root.tiltRight ? shift : 0;
         readonly property real shift2: root.tiltRight ? 0 : shift;
+         
 
         ShapePath{
             strokeWidth: 0;
