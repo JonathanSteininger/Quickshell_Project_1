@@ -64,7 +64,8 @@ Singleton {
 
     property list<string> rightMap:[
         "audio",
-        "time"
+        "time",
+        "brightness"
     ]
 
 
