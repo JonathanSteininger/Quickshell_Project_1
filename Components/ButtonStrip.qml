@@ -56,14 +56,21 @@ Shape{
     }
     Shape{
         id: hoverShape
-        property int childIndex: 0;
-        property real childWidth: root.innerChildren[childIndex].width;
-        property real childOffset: root.innerChildren[childIndex].x;
+        property int childIndexBuffer: -1;
+        property int previousChildIndex: 0;
+        property int childIndex: -1;
+        onChildIndexChanged: {
+            previousChildIndex = childIndexBuffer;
+            childIndexBuffer = childIndex;
+        }
+        property int usedChildIndex: childIndex != -1 ? childIndex : previousChildIndex;
+        property real childWidth: root.innerChildren[usedChildIndex].width;
+        property real targetHeight: childIndex == -1 ? 0 : root.height;
         //width: childWidth + root.spacing;
-        readonly property real shift: height * root.tiltStrength;
-        readonly property real shift1: root.tiltRight ? shift : 0;
-        readonly property real shift2: root.tiltRight ? 0 : shift;
-        width: childWidth + height + root.spacing;
+        x: root.innerChildren[usedChildIndex].x;
+        width: childWidth + targetHeight+ root.spacing;
+        height: targetHeight;
+
         Behavior on x{
             NumberAnimation {
                 duration: 200
@@ -76,13 +83,15 @@ Shape{
                 easing.type: Easing.OutExpo;
             }
         }
-        onWidthChanged:{
-            console.log(width);
-
+        Behavior on height{
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutExpo;
+            }
         }
-        x: childOffset;
-        y: 0;
-        implicitHeight: root.height;
+        readonly property real shift: height * root.tiltStrength;
+        readonly property real shift1: root.tiltRight ? shift : 0;
+        readonly property real shift2: root.tiltRight ? 0 : shift;
 
         ShapePath{
             strokeWidth: 0;
@@ -107,6 +116,30 @@ Shape{
             }
         }
     }
+    Repeater{
+        model: root.innerChildren.length;
+        Shape{
+            required property int index;
+            visible: index != 0;
+            id: lineSplitter;
+            height: parent.height;
+            x: root.innerChildren[index].x;
+            readonly property real shift: height * root.tiltStrength;
+            readonly property real shift1: root.tiltRight ? shift : 0;
+            readonly property real shift2: root.tiltRight ? 0 : shift;
+            width: shift;
+            ShapePath{
+                strokeColor: root.borderColor;
+                strokeWidth: root.borderSize;
+                startY: 0
+                startX: lineSplitter.shift1;
+                PathLine{
+                    y: lineSplitter.height;
+                    x: lineSplitter.shift2;
+                }
+            }
+        }
+    }
 
     RowLayout{
         id: childContainer;
@@ -121,77 +154,30 @@ Shape{
         anchors.fill: parent;
         hoverEnabled: true;
         onReleased: {
-            parent.clickButton(mouseX, mouseY);
         }
         onPositionChanged: {
             parent.checkChildrenHover(mouseX, mouseY);
         }
         onExited: {
-            parent.clearHover();
+            hoverShape.childIndex = -1;
         }
     }
-    function setHoverdChild(){
-    }
-    function clearHover(){
-        x3=x2;
-        y3=y2;
-        x4=x1;
-        y4=y1;
-    }
-    function setHoverIndex(index): bool{
-        if(index < 0 || index >= children.length){
-            return false;
-        }
-        return false;
+    function checkChildrenHover(_x, _y){
+        hoverShape.childIndex = checkPosInBounds(_x, _y);
     }
 
-    function clickButton(_x, _y){
-        var index = checkPosInBounds(_x, _y);
-        if (index == -1){
-            return;
-        }
-        children[index].clicked();
-    }
 
     function checkPosInBounds(_x, _y): int{
-        //calculates the current offset from the mouse relative to the tilt.
-        //can use this value with simple position info to get hovered element.
-        //We only have to compute once then.
-        var riseRun = tiltStrength;
-        if (!tiltRight){
-            riseRun *= -1;
-        }
-        var hitboxOffset = _y * riseRun;
-        var tiltOffset = height*tiltStrength/2;
-        _x += hitboxOffset;
-        if (tiltRight){
-            tiltOffset *= -1;
-        }
-        for (var i = 1; i < children.length; i++){
-            if(children[i].onClicked == undefined){
-                continue;
-            }
-            var shift = spacing/2;
-            if(i == 1 || i == children.length -1){
-                shift = horizontalPadding;
-            }
-            var _left = children[i].x - shift - tiltOffset;
-            var _right = children[i].x + children[i].width + shift - tiltOffset;
-            if (_left < _x && _x < _right ){
+        _x -= _y * tiltStrength;
+        var offset = spacing/2;
+        for(var i = 0; i < innerChildren.length; i++){
+            var _left = innerChildren[i].x;
+            var _right = innerChildren[i].x + innerChildren[i].width + spacing;
+            if(_x >= _left && _x < _right){
                 return i;
             }
         }
-
         return -1;
     }
 
-    function checkChildrenHover(_x, _y): void{
-        var index = checkPosInBounds(_x, _y);
-        if (index == -1){
-            clearHover();
-            requestPaint();
-            return;
-        }
-        setHoverIndex(index);
-    }
 }
