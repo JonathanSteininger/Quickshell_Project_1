@@ -20,6 +20,12 @@ Shape{
 
     property real horizontalPadding: 15;
     property real spacing: horizontalPadding*2;
+    Behavior on width{
+        NumberAnimation {
+            duration: 200;
+            easing.type: Easing.OutExpo;
+        }
+    }
 
     width: childContainer.width + horizontalPadding*2 + height;
     height: parent.height;
