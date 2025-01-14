@@ -154,6 +154,7 @@ Shape{
         anchors.fill: parent;
         hoverEnabled: true;
         onReleased: {
+            parent.clickChild(mouseX, mouseY);
         }
         onPositionChanged: {
             parent.checkChildrenHover(mouseX, mouseY);
@@ -163,7 +164,15 @@ Shape{
         }
     }
     function checkChildrenHover(_x, _y){
-        hoverShape.childIndex = checkPosInBounds(_x, _y);
+        var index = checkPosInBounds(_x, _y);
+        hoverShape.childIndex = index;
+    }
+
+    function clickChild(_x, _y){
+        var index = checkPosInBounds(_x, _y);
+        if (index != -1){
+            innerChildren[index].clicked();
+        }
     }
 
 
@@ -174,6 +183,9 @@ Shape{
             var _left = innerChildren[i].x;
             var _right = innerChildren[i].x + innerChildren[i].width + spacing;
             if(_x >= _left && _x < _right){
+                if (innerChildren[i].onClicked == undefined){
+                    return -1;
+                }
                 return i;
             }
         }
