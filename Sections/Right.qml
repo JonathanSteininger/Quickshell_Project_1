@@ -19,7 +19,8 @@ ButtonStrip{
     implicitHeight: 50;
 
     function convertPopoutPosition(_x, _width){
-        return width - (_x + _width);
+        //+15 because thats the corner size of the popout.
+        return width - (_x + _width + spacing + 15);
     }
     innerChildren: [
     Text{
@@ -103,8 +104,6 @@ ButtonStrip{
                 color: Colour.fg;
             }
         }
-        //do this to hide the repeater as a child. uwu --very ugly - pretty much setting width = 0;
-        width: -parent.spacing;
     },
     Rectangle{
         width: childrenRect.width + 20;

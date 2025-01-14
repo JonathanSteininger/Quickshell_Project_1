@@ -22,6 +22,10 @@ ButtonStrip{
     property var currentlyFocusedWorkspace: undefined;
     //used to generate workspace sections.
     property var componentFactory: Qt.createComponent("../Dynamic/WorkspaceSection.qml");
+    function convertPopoutPosition(xpos: int): int{
+        //-15 because thats the popout windows corner.
+        return shift + xpos -15;
+    }
 
     innerChildren: [
         Text{
@@ -32,7 +36,7 @@ ButtonStrip{
             font.pointSize: 14;
             horizontalAlignment: Text.AlignHCenter;
             signal clicked();
-            onClicked: () => GlobalState.popupLeft("time", x);
+            onClicked: () => GlobalState.popupLeft("time", leftPanel.convertPopoutPosition(x));
             Process {
                 id: dateProc;
                 command: ["date", "+%r"];
