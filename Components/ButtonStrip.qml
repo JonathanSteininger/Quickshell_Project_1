@@ -18,8 +18,7 @@ Shape{
     property real borderSize: 2;
     property real tiltStrength: 1;
 
-    property real horizontalPadding: 15;
-    property real spacing: horizontalPadding*2;
+    property real spacing: 30;
     Behavior on width{
         NumberAnimation {
             duration: 200;
@@ -27,7 +26,7 @@ Shape{
         }
     }
 
-    width: childContainer.width + horizontalPadding*2 + height;
+    width: childContainer.width + spacing + height;
     height: parent.height;
 
     clip: false;
@@ -156,7 +155,7 @@ Shape{
         id: childContainer;
         height: parent.height;
         spacing: root.spacing;
-        x: root.height/2 + root.horizontalPadding;
+        x: root.height/2 + root.spacing/2;
     }
 
 
@@ -188,7 +187,12 @@ Shape{
 
 
     function checkPosInBounds(_x, _y): int{
-        _x -= _y * tiltStrength;
+        if(tiltRight){
+            //+1 feels more accurate.
+            _x -= (height - _y + 1) * tiltStrength;
+        }else{
+            _x -= _y * tiltStrength;
+        }
         var offset = spacing/2;
         for(var i = 0; i < innerChildren.length; i++){
             var _left = innerChildren[i].x;
