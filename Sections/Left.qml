@@ -67,15 +67,6 @@ ButtonStrip{
             addWorkspace(...data);
         }
     }
-    Process {
-        id: updateActiveWorkspaceProc;
-        running: true;
-        //command: ["hyprctl", "--instance", "0", "activeworkspace", "-j"];
-        command: ["sh", "-c", "hyprctl --instance 0 activeworkspace -j | jq '.id'"];
-        stdout: SplitParser {
-            onRead: data => updateActiveWorkspace(data);
-        }
-    }
     function updateActiveWorkspace(id){
         if(currentlyFocusedWorkspace != undefined){
             currentlyFocusedWorkspace.color = Colour.fg;
@@ -158,6 +149,15 @@ ButtonStrip{
     }
     function sort(workspaces) {
         var output = [];
+    }
+    Process {
+        id: updateActiveWorkspaceProc;
+        running: true;
+        //command: ["hyprctl", "--instance", "0", "activeworkspace", "-j"];
+        command: ["sh", "-c", "hyprctl --instance 0 activeworkspace -j | jq '.id'"];
+        stdout: SplitParser {
+            onRead: data => updateActiveWorkspace(data);
+        }
     }
 }
 
