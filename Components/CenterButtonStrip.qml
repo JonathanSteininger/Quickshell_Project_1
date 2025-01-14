@@ -17,7 +17,7 @@ Canvas{
 
     property real horizontalPadding: 15;
     property real spacing: horizontalPadding*2;
-    property int center: 1;
+    property int center: 0;
 
 
     implicitWidth: children.reduce((output, child) => output + child.width, 0) + (getShift() * 2);
