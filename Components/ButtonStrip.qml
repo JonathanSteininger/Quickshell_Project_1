@@ -72,10 +72,10 @@ Shape{
         property int usedChildIndex: childIndex != -1 ? childIndex : previousChildIndex;
         property real childWidth: root.innerChildren[usedChildIndex].width;
         property real targetHeight: childIndex == -1 ? 0 : root.height;
-        property real shapeHeight: targetHeight
+        property real shapeHeight: targetHeight;
         //width: childWidth + root.spacing;
         x: root.innerChildren[usedChildIndex].x;
-        width: childWidth + targetHeight+ root.spacing;
+        width: childWidth + height + root.spacing;
         height: root.height;
 
         Behavior on x{
@@ -99,6 +99,9 @@ Shape{
         readonly property real shift: height * root.tiltStrength;
         readonly property real shift1: root.tiltRight ? shift : 0;
         readonly property real shift2: root.tiltRight ? 0 : shift;
+
+        readonly property real ratio: 1 - (shapeHeight / height);
+        readonly property real shiftMid: (root.tiltRight ? -1 : 1) * shift * ratio;
          
 
         ShapePath{
@@ -111,12 +114,12 @@ Shape{
                 x: hoverShape.width - hoverShape.shift2;
             }
             PathLine{
-                y: hoverShape.height;
-                x: hoverShape.width - hoverShape.shift1;
+                y: hoverShape.shapeHeight;
+                x: hoverShape.width - hoverShape.shift1 - hoverShape.shiftMid;
             }
             PathLine{
-                y: hoverShape.height;
-                x: hoverShape.shift2;
+                y: hoverShape.shapeHeight;
+                x: hoverShape.shift2 - hoverShape.shiftMid;
             }
             PathLine{
                 y: 0;
