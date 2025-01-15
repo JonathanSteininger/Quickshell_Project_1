@@ -44,7 +44,6 @@ Rectangle{
         border.color: mouseBox.containsMouse ? clickColor : boxColor;
         border.width: 2;
         color: activeColor;
-        //color: mouseBox.containsMouse ? clickColor : activeColor;
         ButtonBehavior on color{}
         ButtonBehavior on border.color{}
         signal clicked();
@@ -86,6 +85,7 @@ Rectangle{
         required property string boxColor;
         required property string usedBarColor;
         required property string emptyBarColor;
+        property string backupPicture: `root:Images/no_art.jpg`;
         Rectangle{
             id: container;
             width: player.width - player.padding*2;
@@ -106,7 +106,7 @@ Rectangle{
                         id: artBacking;
                         height: parent.height;
                         width: parent.width;
-                        source: player.model.trackArtUrl || "/home/Aureus/Pictures/profile.PNG";
+                        source: player.model.trackArtUrl || player.backupPicture;
                         fillMode: Image.PreserveAspectCrop;
                         visible: false;
                     }
@@ -125,7 +125,7 @@ Rectangle{
                     Image{
                         height: parent.height;
                         width: parent.width;
-                        source: player.model.trackArtUrl || "/home/Aureus/Pictures/profile.PNG";
+                        source: player.model.trackArtUrl || player.backupPicture;
                         fillMode: Image.PreserveAspectFit;
                         clip: true;
                         layer.enabled: true;
@@ -271,6 +271,7 @@ Rectangle{
                         overShootLocation: 1.0;
                         stepSize: 1;
                         from: 0;
+                        height: 30;
                         disableBars: true;
                         value: player.model.position;
                         to: player.model.length;
@@ -360,6 +361,14 @@ Rectangle{
                                         onPositionChanged:{
                                             hovered = parent.contains(Qt.point(mouseX, mouseY));
                                         }
+                                        onClicked: {
+                                            if(parent.contains(Qt.point(mouseX, mouseY))){
+                                                player.model.previous();
+                                                if(!player.model.isPlaying){
+                                                    player.model.play();
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -412,7 +421,6 @@ Rectangle{
                                             hovered = parent.contains(Qt.point(mouseX, mouseY));
                                         }
                                         onClicked: {
-                                            console.log("hi");
                                             if(parent.contains(Qt.point(mouseX, mouseY))){
                                                 if(player.model.isPlaying){
                                                     player.model.pause();
@@ -471,6 +479,14 @@ Rectangle{
                                         }
                                         onPositionChanged:{
                                             hovered = parent.contains(Qt.point(mouseX, mouseY));
+                                        }
+                                        onClicked: {
+                                            if(parent.contains(Qt.point(mouseX, mouseY))){
+                                                player.model.next();
+                                                if(!player.model.isPlaying){
+                                                    player.model.play();
+                                                }
+                                            }
                                         }
                                     }
                                 }

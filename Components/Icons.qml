@@ -40,7 +40,7 @@ Singleton{
     readonly property string arrow_left: `${iconPathLocal}arrow-fat-left-fill.svg`;
 
 
-    readonly property string music_note: `${iconPathLocal}misic-notes-fill.svg`;
+    readonly property string music_note: `${iconPathLocal}music-notes-fill.svg`;
 
 
     readonly property string headphones: `${iconPathLocal}headphones-fill.svg`;
