@@ -1,7 +1,7 @@
 import Quickshell
 import Quickshell.Io
+import Quickshell.Widgets;
 import Quickshell.Services.SystemTray
-import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -17,212 +17,194 @@ ButtonStrip{
     tiltRight: true;
     tiltStrength: 1
     implicitHeight: 50;
+    component SquaredIcon: Rectangle{
+            property string icon: "";
+            anchors.verticalCenter: rightPanel.verticalCenter;
+            height: 32;
+            width: height;
+            color: Colour.trans;
+            IconImage{
+                id:image;
+                anchors.horizontalCenter: parent.horizontalCenter; 
+                source: `root:${parent.icon}`;
+                implicitSize: parent.height;
+                visible:false;
+            }
+            ColorOverlay{
+                anchors.fill: image;
+                source: image;
+                color: Colour.fg;
+                smooth: true;
+                antialiasing: true;
+                visible:true;
+            }
+            signal clicked();
+        }
 
     function convertPopoutPosition(_x, _width){
         //+15 because thats the corner size of the popout.
         return width - (_x + _width + spacing + 15);
     }
     innerChildren: [
-    Text{
-        text: " ";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 18;
-        horizontalAlignment: Text.AlignHCenter;
-        width: 30;
-        signal clicked();
-        onClicked: () => console.log("open brightness");
-        onWidthChanged: {
-        }
-    },
-    Text{
-        text: "󰁆";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 18;
-        horizontalAlignment: Text.AlignHCenter;
-        width: 30;
-        signal clicked();
-        onClicked: () => console.log("open brightness");
-        onWidthChanged: {
-        }
-    },
-    Text{
-        text: "󰁞";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 18;
-        horizontalAlignment: Text.AlignHCenter;
-        width: 30;
-        onWidthChanged: {
-        }
-    },
-    Text{
-        text: "";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 18;
-        horizontalAlignment: Text.AlignHCenter;
-        width: 30;
-        signal clicked();
-        onClicked: () => console.log("open brightness");
-        onWidthChanged: {
-        }
-    },
-    Text{
-        text: " ";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 18;
-        horizontalAlignment: Text.AlignHCenter;
-        width: 30;
-        signal clicked();
-        onClicked: () =>{
-            GlobalState.popupRight("time",rightPanel.convertPopoutPosition( x, width));
-        }
-
-    },
-    Repeater{
-        model: SystemTray.items;
-        Rectangle{
-            id: trayParent
-            required property SystemTrayItem modelData;
+        SquaredIcon{
+            icon: Icons.brightness;
+            onClicked: console.log("brightness");
+        },
+        SquaredIcon{
+            icon: Icons.network_up;
+            onClicked: console.log("brightness");
+        },
+        SquaredIcon{
+            icon: Icons.network_down;
+            onClicked: console.log("brightness");
+        },
+        SquaredIcon{
+            icon: Icons.temp;
+            onClicked: console.log("brightness");
+        },
+        Repeater{
+            model: SystemTray.items;
+            Rectangle{
+                id: trayParent
+                required property SystemTrayItem modelData;
+                width: childrenRect.width;
+                height: childrenRect.height;
+                Image{
+                    id: image;
+                    source:modelData.icon;
+                    width: 30;
+                    height: 30;
+                }
+                color: Colour.trans;
+                signal clicked();
+                onClicked: () => modelData.activate();
+                ColorOverlay{
+                    anchors.fill: image;
+                    source: image;
+                    color: Colour.fg;
+                }
+            }
+        },
+        RowLayout{
             width: childrenRect.width;
             height: childrenRect.height;
-            Image{
-                id: image;
-                source:modelData.icon;
-                width: 30;
-                height: 30;
-            }
-            color: Colour.trans;
             signal clicked();
-            onClicked: () => modelData.activate();
-            ColorOverlay{
-                anchors.fill: image;
-                source: image;
-                color: Colour.fg;
+            onClicked: () => {
+                GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
             }
-        }
-    },
-    Rectangle{
-        width: childrenRect.width + 20;
-        height: childrenRect.height;
-        color: Colour.trans;
-        signal clicked();
-        onClicked: () => {
-            GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
-        }
+            Text{
+                id: volume
+                horizontalAlignment: Text.AlignRight;
+                property real volume: GlobalState.defaultAudio.audio.volume;
+                Layout.preferredWidth: 40;
+                text: `${Math.floor(this.volume*100)}%`;
+                color: Colour.fg;
+                font.family: "Iosevka";
+                font.pointSize: 14;
+            }
+            SquaredIcon{
+                icon: getIcon();
+                height: 24;
+                function getIcon(){
+                    if(GlobalState.defaultAudio == null){
+                        return Icons.volume_mute
+                    }
+                    var audio = GlobalState.defaultAudio.audio;
+                    if(audio.muted){
+                        return Icons.volume_mute;
+                    }
+                    if(audio.volume >= 0.7){
+                        return Icons.volume_high;
+                    }
+                    if(audio.volume < 0.7 && audio.volume >= 0.1){
+                        return Icons.volume_low;
+                    }
+                    return Icons.volume_x;
+                }
+
+            }
+        },
         Text{
-            id: volume
-            horizontalAlignment: Text.AlignRight;
-            property real volume: GlobalState.defaultAudio.audio.volume;
-            width: 60;
-            text: `${Math.floor(this.volume*100)}%`;
+            id: battery
+            text: "hello";
             color: Colour.fg;
             font.family: "Iosevka";
             font.pointSize: 14;
-        }
-        Text{
-            x: 5;
-            color: Colour.fg;
-            text: getIcon();
-            function getIcon(){
-                if(GlobalState.defaultAudio == null){
-                    return "?";
-                }
-                if(GlobalState.defaultAudio.audio.muted){
-                    return "M"
-                }
-                if(GlobalState.defaultAudio.audio.volume > 0.8){
-                    return "H"
-                }
-                return "L"
+            Timer{
+                interval: 5000;
+                repeat: true;
+                running: true;
+                onTriggered: batteryProc.running = true;
+            }
+            Process{
+                id: batteryProc;
+                running: true;
+                command: ["sh", "-c", `bc <<< "scale=3;$(cat /sys/class/power_supply/BAT0/charge_now )/$(cat /sys/class/power_supply/BAT0/charge_full) * 100" | sed 's/..$//'`];
 
-            }
-        }
-    },
-    Text{
-        id: battery
-        text: "hello";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        Timer{
-            interval: 5000;
-            repeat: true;
-            running: true;
-            onTriggered: batteryProc.running = true;
-        }
-        Process{
-            id: batteryProc;
-            running: true;
-            command: ["sh", "-c", `bc <<< "scale=3;$(cat /sys/class/power_supply/BAT0/charge_now )/$(cat /sys/class/power_supply/BAT0/charge_full) * 100" | sed 's/..$//'`];
-
-            stdout: SplitParser{
-                onRead: (data) => {
-                    battery.text = `${data}%`
-                }
-            }
-            
-            stderr: SplitParser{
-                onRead: (data) => {
-                    console.log("Battery usage process failed. Removing Component because you prob have no battery... or some other error.");
-                    console.log("bat usage error:", data);
-                    battery.destroy();
-                }
-            }
-            onExited: (exitCode, exitStatus) => {
-                if(exitCode != 0){
-                    console.log("error code returned from battery usage process:", exitCode);
-                    battery.destroy();
-                }
-            }
-        }
-    },
-    Text{
-        id: charging
-        text: "hello";
-        color: Colour.fg;
-        font.family: "Iosevka";
-        font.pointSize: 14;
-        Timer{
-            interval: 5000;
-            repeat: true;
-            running: true;
-            onTriggered: chargingProc.running = true;
-        }
-        Process{
-            id: chargingProc;
-            running: true;
-            command: ["sh", "-c", "acpi"];
-            stdout: SplitParser{
-                onRead: data => {
-                    var _sections = data.split(" ");
-                    var output = "no battery?";
-                    for (var i = 0; i < _sections.length; i++){
-                        if (_sections[i].includes(":")){
-                            output = _sections[i];
-                        }
+                stdout: SplitParser{
+                    onRead: (data) => {
+                        battery.text = `${data}%`
                     }
-                    var time = output;
-                    charging.text = `${time}`;
+                }
+
+                stderr: SplitParser{
+                    onRead: (data) => {
+                        console.log("Battery usage process failed. Removing Component because you prob have no battery... or some other error.");
+                        console.log("bat usage error:", data);
+                        battery.destroy();
+                    }
+                }
+                onExited: (exitCode, exitStatus) => {
+                    if(exitCode != 0){
+                        console.log("error code returned from battery usage process:", exitCode);
+                        battery.destroy();
+                    }
                 }
             }
-            stderr: SplitParser{
-                onRead: (data) => {
-                    console.log("battery remaining failed... or some other error.");
-                    console.log("battery remaining  error:", data);
-                    charging.destroy();
-                }
+        },
+        Text{
+            id: charging
+            text: "hello";
+            color: Colour.fg;
+            font.family: "Iosevka";
+            font.pointSize: 14;
+            Timer{
+                interval: 5000;
+                repeat: true;
+                running: true;
+                onTriggered: chargingProc.running = true;
             }
-            onExited: (exitCode, exitStatus) => {
-                if(exitCode != 0){
-                    console.log("error code returned from battery remaining process:", exitCode);
-                    charging.destroy();
+            Process{
+                id: chargingProc;
+                running: true;
+                command: ["sh", "-c", "acpi"];
+                stdout: SplitParser{
+                    onRead: data => {
+                        var _sections = data.split(" ");
+                        var output = "no battery?";
+                        for (var i = 0; i < _sections.length; i++){
+                            if (_sections[i].includes(":")){
+                                output = _sections[i];
+                            }
+                        }
+                        var time = output;
+                        charging.text = `${time}`;
+                    }
+                }
+                stderr: SplitParser{
+                    onRead: (data) => {
+                        console.log("battery remaining failed... or some other error.");
+                        console.log("battery remaining  error:", data);
+                        charging.destroy();
+                    }
+                }
+                onExited: (exitCode, exitStatus) => {
+                    if(exitCode != 0){
+                        console.log("error code returned from battery remaining process:", exitCode);
+                        charging.destroy();
+                    }
                 }
             }
         }
-    }
-]
+    ]
 }
