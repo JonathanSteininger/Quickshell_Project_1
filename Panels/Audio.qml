@@ -118,8 +118,8 @@ Rectangle{
                 }
             }
             Rectangle{
-                width: 50;
-                height: 24;
+                height: 28;
+                width: 40;
                 color: item.audioNode != null ? (item.audioNode.muted ? item.activeColor : item.activeBackgroundColor) : item.activeBackgroundColor;
                 border.width: 1;
                 border.color: item.activeColor;
@@ -138,11 +138,11 @@ Rectangle{
                         item.audioNode.muted = !item.audioNode.muted;
                     }
                 }
-                Text{
+                Components.SquaredIcon{
                     anchors.centerIn: parent;
-                    color: item.activeTextColor;
-                    font.family: item.fontFamily;
-                    text: "Mute";
+                    icon: Components.Icons.volume_mute;
+                    height: 20;
+                    iconColor: Components.Colour.fg;
                 }
             }
         }
