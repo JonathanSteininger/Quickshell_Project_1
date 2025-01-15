@@ -2,6 +2,8 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import Quickshell.Widgets
+import QtQml
 import QtQml.Models
 import "../Components/" as Components
 import Quickshell.Services.Pipewire
@@ -14,6 +16,20 @@ Rectangle{
     height: frame.height + manualGap * 2;
     property real maxHeight: 800;
     property PwObjectTracker tracker: Components.GlobalState.tracker;
+    //can set default icons for specific audio outputs
+    property var iconMap: {
+        "M Series Headphone + Monitor Out": Components.Icons.headphones,
+        "Built-in Audio Analog Stereo": Components.Icons.speaker,
+        "Vega 20 HDMI Audio [Radeon VII] Digital Stereo (HDMI)": Components.Icons.display,
+    }
+    function getIcon(name:string):string{
+        //var index = root.iconMap.findIndex((child) => child.key.includes(name))
+        var icon = iconMap[name];
+        if (icon == undefined){
+            return Components.Icons.speaker_unknown;
+        }
+        return icon;
+    }
     clip: false
     MouseArea{
         width: root.width;
@@ -40,6 +56,7 @@ Rectangle{
         required property var activeTextColor;
         required property var activeBackgroundColor;
         required property var fontFamily;
+        property var icon: Components.Icons.speaker_unknown;
         property bool isDevice: false;
         border.width: 2;
         radius: 2;
@@ -58,10 +75,15 @@ Rectangle{
             x: padding;
             y: padding;
             color: Components.Colour.trans;
+            Components.SquaredIcon{
+                id: icon;
+                icon: item.icon;
+                height: 32;
+            }
             Text {
-                width: parent.width;
                 anchors.top: parent.top;
-                anchors.left: parent.left;
+                width: parent.width - icon.width;
+                anchors.left: icon.right;
                 anchors.bottom: slider.top;
                 //verticalAlignment: Text.AlignVCenter;
                 color: item.activeTextColor;
@@ -212,6 +234,7 @@ Rectangle{
                     isDevice: true;
                     height: 100;
                     clip: true;
+                    icon: root.getIcon(description);
                     activeColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active : Components.Colour.accent) : "white";
                     activeSecondaryColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active3 : Components.Colour._active2) : "white";
                     activeSliderColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour.selectedDark : Components.Colour.accent_dark) : "white";

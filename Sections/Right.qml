@@ -17,29 +17,6 @@ ButtonStrip{
     tiltRight: true;
     tiltStrength: 1
     implicitHeight: 50;
-    component SquaredIcon: Rectangle{
-            property string icon: "";
-            anchors.verticalCenter: rightPanel.verticalCenter;
-            height: 32;
-            width: height;
-            color: Colour.trans;
-            IconImage{
-                id:image;
-                anchors.horizontalCenter: parent.horizontalCenter; 
-                source: `root:${parent.icon}`;
-                implicitSize: parent.height;
-                visible:false;
-            }
-            ColorOverlay{
-                anchors.fill: image;
-                source: image;
-                color: Colour.fg;
-                smooth: true;
-                antialiasing: true;
-                visible:true;
-            }
-            signal clicked();
-        }
 
     function convertPopoutPosition(_x, _width){
         //+15 because thats the corner size of the popout.
