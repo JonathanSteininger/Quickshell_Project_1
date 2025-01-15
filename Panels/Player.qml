@@ -518,29 +518,58 @@ Rectangle{
         }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     color: Components.Colour.trans;
     Rectangle{
         id: playerSelector;
-        //visible: Components.GlobalState.players.values.length > 1;
         height: Components.GlobalState.players.values.length > 1 ? 50 : 0;
         clip: true;
         LineBehavior on height{}
         width: root.width * 0.8;
         anchors.horizontalCenter: parent.horizontalCenter;
         color: Components.Colour.trans;
-        StyledButton{
+        Rectangle{
             id: prevPlayerButton;
-            filled: false;
-            hoverEnabled: true;
+            width: childrenRect.width;
+            height: childrenRect.height;
+            color: Components.Colour.trans;
             anchors.verticalCenter: parent.verticalCenter;
-            textColor: Components.Colour.fg;
-            boxColor: Components.Colour.accent;
-            clickColor: Components.Colour._active;
-            width: 80;
-            height: 40;
-            text: "Prev"
-            onClicked:{
-                Components.GlobalState.previousPlayer();
+            Components.SquaredIcon{
+                icon: Components.Icons.arrow_left;
+                height: 50;
+                iconColor: prevPlayerButtonMouseArea.containsMouse ? Components.Colour._active : Components.Colour.accent;
+                Behavior on iconColor{
+                    ColorAnimation{
+                        duration: 50;
+                    }
+                }
+                MouseArea{
+                    id: prevPlayerButtonMouseArea;
+                    anchors.fill: parent;
+                    hoverEnabled: true;
+                    onClicked: {
+                        Components.GlobalState.previousPlayer();
+                    }
+                }
             }
         }
         Rectangle{
@@ -569,20 +598,30 @@ Rectangle{
                 }
             }
         }
-        StyledButton{
+        Rectangle{
             id: nextPlayerButton;
-            filled: false;
-            hoverEnabled: true;
-            anchors.right: parent.right;
+            width: childrenRect.width;
+            height: childrenRect.height;
+            color: Components.Colour.trans;
             anchors.verticalCenter: parent.verticalCenter;
-            textColor: Components.Colour.fg;
-            boxColor: Components.Colour.accent;
-            clickColor: Components.Colour._active;
-            width: 80;
-            height: 40;
-            text: "Next"
-            onClicked:{
-                Components.GlobalState.nextPlayer();
+            anchors.right: parent.right;
+            Components.SquaredIcon{
+                icon: Components.Icons.arrow_right;
+                height: 50;
+                iconColor: nextPlayerButtonMouseArea.containsMouse ? Components.Colour._active : Components.Colour.accent;
+                Behavior on iconColor{
+                    ColorAnimation{
+                        duration: 50;
+                    }
+                }
+                MouseArea{
+                    id: nextPlayerButtonMouseArea;
+                    anchors.fill: parent;
+                    hoverEnabled: true;
+                    onClicked: {
+                        Components.GlobalState.previousPlayer();
+                    }
+                }
             }
         }
     }
