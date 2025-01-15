@@ -10,6 +10,7 @@ Rectangle{
     height: 32;
     width: height;
     color: Colour.trans;
+    property string iconColor: Colour.fg;
     IconImage{
         id:image;
         anchors.horizontalCenter: parent.horizontalCenter; 
@@ -20,7 +21,7 @@ Rectangle{
     ColorOverlay{
         anchors.fill: image;
         source: image;
-        color: Colour.fg;
+        color: iconColor;
         smooth: true;
         antialiasing: true;
         visible:true;
