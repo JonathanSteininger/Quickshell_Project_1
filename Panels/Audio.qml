@@ -142,7 +142,12 @@ Rectangle{
                     anchors.centerIn: parent;
                     icon: Components.Icons.volume_mute;
                     height: 20;
-                    iconColor: Components.Colour.fg;
+                    iconColor: item.audioNode.muted ? item.activeSliderColor : item.activeTextColor;
+                    Behavior on iconColor{
+                        ColorAnimation {
+                            duration: 100;
+                        }
+                    }
                 }
             }
         }
