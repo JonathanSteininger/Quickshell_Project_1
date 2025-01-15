@@ -69,6 +69,10 @@ ButtonStrip{
             onClicked: () => {
                 GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
             }
+            signal wheel(wheelEvent: WheelEvent);
+            onWheel:(event) => {
+                GlobalState.defaultAudio.audio.volume += Math.round(event.angleDelta.y/360 * 0.1 * 1000)/1000;
+            }
             Text{
                 id: volume
                 horizontalAlignment: Text.AlignRight;

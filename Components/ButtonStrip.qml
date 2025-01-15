@@ -172,15 +172,41 @@ Shape{
         onExited: {
             hoverShape.childIndex = -1;
         }
+        onWheel: (wheelEvent) => {
+            root.scrollChild(wheelEvent);
+        }
     }
+
+    function scrollChild(wheelEvent){
+        if(hoverShape.childIndex == -1){
+            return;
+        }
+
+        if(innerChildren[hoverShape.childIndex].onWheel == undefined){
+            return;
+        }
+        innerChildren[hoverShape.childIndex].wheel(wheelEvent);
+    }
+
     function checkChildrenHover(_x, _y){
         var index = checkPosInBounds(_x, _y);
+        if(index == -1){
+            hoverShape.childIndex = index;
+            return;
+        }
+        if(innerChildren[index].onClicked == undefined){
+            hoverShape.childIndex = -1;
+            return;
+        }
         hoverShape.childIndex = index;
     }
 
     function clickChild(_x, _y){
         var index = checkPosInBounds(_x, _y);
         if (index != -1){
+            if(innerChildren[index].onClicked == undefined){
+                return;
+            }
             innerChildren[index].clicked();
         }
     }
@@ -198,9 +224,6 @@ Shape{
             var _left = innerChildren[i].x;
             var _right = innerChildren[i].x + innerChildren[i].width + spacing;
             if(_x >= _left && _x < _right){
-                if (innerChildren[i].onClicked == undefined){
-                    return -1;
-                }
                 return i;
             }
         }
