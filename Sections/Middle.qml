@@ -7,36 +7,71 @@ import "../Components/"
 
 CenterButtonStrip{
     id: root;
-    anchors.centerIn: parent
     tiltStrength: 1
     borderColor: Colour.accent;
-    borderSize: 0.6;
+    borderSize: 1;
     color: Colour.bg;
     tiltRight: false
-    Rectangle{
-        width: Math.max(childrenRect.width, 200);
-        height: childrenRect.height;
-        color: Colour.trans;
-        Text{
-            property bool center: true;
-            color: Colour.fg
-            anchors.horizontalCenter: parent.horizontalCenter;
-            horizontalAlignment: Text.AlignLeft;
-            text: GlobalState.activePlayerActual.trackTitle;
-            width: Math.min(implicitWidth, 400);
-            clip: true;
-            onTextChanged: () => {
-                root._update();
-            }
+    centerIndex: 2;
+    x: parent.width/2 - getCenter();
+    function getCenter(){
+        if(centerIndex < 0 || centerIndex >= innerChildren.length){
+            return 0;
         }
-        signal clicked()
-        onClicked: () => {
-            GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-        }
+        var centerObject = innerChildren[centerIndex];
+        var centerPosition = centerObject.x + centerObject.width/2 + spacing/2 + height/2;
+        return centerPosition;
     }
-
     function convertPopoutPosition(_x, _width){
-        var output = _x + _width/2 - this.width/2;
-        return output;
+        if(centerIndex < 0 || centerIndex >= innerChildren.length){
+            return 0;
+        }
+        var centerObject = innerChildren[centerIndex];
+        var centerPosition = centerObject.x + centerObject.width/2;
+        var output = _x + _width/2;
+        return output - centerPosition;
     }
+    innerChildren:[
+        Text{
+            text: "1";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Rectangle{
+            width: Math.max(childrenRect.width, 200);
+            height: childrenRect.height;
+            color: Colour.trans;
+            property bool center: true;
+            Text{
+                property bool center: true;
+                color: Colour.fg
+                anchors.horizontalCenter: parent.horizontalCenter;
+                horizontalAlignment: Text.AlignLeft;
+                text: GlobalState.activePlayerActual.trackTitle;
+                width: Math.min(implicitWidth, 400);
+                clip: true;
+                onTextChanged: () => {
+                    root._update();
+                }
+            }
+            signal clicked()
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "3";
+            signal clicked();
+        }
+    ]
+
 }
