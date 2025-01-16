@@ -103,7 +103,6 @@ Shape{
 
         readonly property real ratio: 1 - (shapeHeight / height);
         readonly property real shiftMid: (root.tiltRight ? -1 : 1) * shift * ratio;
-         
 
         ShapePath{
             strokeWidth: 0;
@@ -215,16 +214,31 @@ Shape{
 
 
     function checkPosInBounds(_x, _y): int{
+        var opposit_x = _x;
         if(tiltRight){
             //+1 feels more accurate.
+            opposit_x -= _y * tiltStrength;
             _x -= (height - _y + 1) * tiltStrength;
         }else{
+            opposit_x -= (height - _y + 1) * tiltStrength;
             _x -= _y * tiltStrength;
         }
         var offset = spacing/2;
         for(var i = 0; i < innerChildren.length; i++){
             var _left = innerChildren[i].x;
             var _right = innerChildren[i].x + innerChildren[i].width + spacing;
+            if(i == centerIndex){
+                if(_x >= _left && opposit_x < _right){
+                    return i;
+                }
+                continue;
+            }
+            if(i > centerIndex){
+                if(opposit_x >= _left && opposit_x < _right){
+                    return i;
+                }
+                continue;
+            }
             if(_x >= _left && _x < _right){
                 return i;
             }
