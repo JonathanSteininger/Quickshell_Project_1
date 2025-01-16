@@ -47,11 +47,12 @@ CenterButtonStrip{
             }
         },
         Rectangle{
-            width: Math.max(childrenRect.width, 200);
+            width: Math.max(playerText.width, 200);
             height: childrenRect.height;
             color: Colour.trans;
             property bool center: true;
             Text{
+                id: playerText;
                 property bool center: true;
                 color: Colour.fg
                 anchors.horizontalCenter: parent.horizontalCenter;
@@ -59,9 +60,6 @@ CenterButtonStrip{
                 text: GlobalState.activePlayerActual.trackTitle;
                 width: Math.min(implicitWidth, 400);
                 clip: true;
-                onTextChanged: () => {
-                    root._update();
-                }
             }
             signal clicked()
             onClicked: () => {
