@@ -6,7 +6,6 @@ import Qt5Compat.GraphicalEffects
 
 Rectangle{
     property string icon: "";
-    anchors.verticalCenter: rightPanel.verticalCenter;
     height: 32;
     width: height;
     color: Colour.trans;
