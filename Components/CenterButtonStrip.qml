@@ -228,17 +228,20 @@ Shape{
             var _left = innerChildren[i].x;
             var _right = innerChildren[i].x + innerChildren[i].width + spacing;
             if(i == centerIndex){
+                //hitbox for center box
                 if(_x >= _left && opposit_x < _right){
                     return i;
                 }
                 continue;
             }
             if(i > centerIndex){
+                //hitbox for right boxes
                 if(opposit_x >= _left && opposit_x < _right){
                     return i;
                 }
                 continue;
             }
+            //hitboxes for left boxes
             if(_x >= _left && _x < _right){
                 return i;
             }
