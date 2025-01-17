@@ -49,12 +49,7 @@ Rectangle{
                     Text{
                         anchors.centerIn: parent;
                         horizontalAlignment: Qt.AlignCenter;
-                        text:  Components.GlobalState.players.values[parent.index].desktopEntry;
-                    }
-                    Text{
-                        anchors.centerIn: parent;
-                        horizontalAlignment: Qt.AlignCenter;
-                        text: parent.index;
+                        text:  Components.GlobalState.players.values[parent.index].identity.split(' ')[0];
                     }
                     signal clicked();
                     onClicked:{
