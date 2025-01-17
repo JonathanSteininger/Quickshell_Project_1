@@ -19,71 +19,59 @@ Rectangle{
         width: root.width;
         height: root.height;
     }
-    component LineBehavior: Behavior{
-        PropertyAnimation{
-            duration: 200;
-            easing.type: Easing.InOutQuad;
-        }
-    }
-    component ButtonBehavior: Behavior{
-        PropertyAnimation{
-            duration: 100;
-            easing.type: Easing.InOutQuad;
-        }
-    }
-    component StyledButton: Rectangle{
-        width: 70;
-        height: 40;
-        required property string textColor;
-        required property string clickColor;
-        required property string boxColor;
-        required property bool filled;
-        property string activeColor: filled ? boxColor : "#00000000";
-        required property string text;
-        property alias hoverEnabled: mouseBox.hoverEnabled;
-        property string fontFamily: "Iosevka";
-        border.color: mouseBox.containsMouse ? clickColor : boxColor;
-        border.width: 2;
-        color: activeColor;
-        ButtonBehavior on color{}
-        ButtonBehavior on border.color{}
-        signal clicked();
-        radius: 5;
-        MouseArea{
-            id: mouseBox;
-            anchors.fill: parent;
-            hoverEnabled: false;
-            onClicked:{
-                parent.clicked();
-            }
-        }
-        Text{
-            anchors.centerIn: parent;
-            color: parent.textColor;
-            text: parent.text;
-        }
-    }
 
-
-
-
-    Components.CenterButtonStrip{
+    Components.CenterButtonStripLayout{
         id: playerSelector;
         width: parent.width;
+        centerIndex: (innerChildren.length-1)/2;
         height: 40;
+        color: Components.Colour.accent;
+        borderColor: Components.Colour.fg;
+        borderSize: 1;
+        centerLine: true;
+        innerChildWidth: parent.width - spacing - height;
         innerChildren: [
             Text{
+                Layout.fillWidth: false;
                 text: "<<";
+                signal clicked();
+                onClicked:{
+                    Components.GlobalState.previousPlayer();
+                }
             },
             Repeater{
                 model: Components.GlobalState.players.values.length;
-                Text{
+                Rectangle{
                     required property int index;
-                    text: index;
+                    Layout.fillWidth: true;
+                    height: childrenRect.height;
+                    color: Components.Colour.trans;
+                    Text{
+                        anchors.centerIn: parent;
+                        horizontalAlignment: Qt.AlignCenter;
+                        text:  Components.GlobalState.players.values[parent.index].desktopEntry;
+                    }
+                    Text{
+                        anchors.centerIn: parent;
+                        horizontalAlignment: Qt.AlignCenter;
+                        text: parent.index;
+                    }
+                    signal clicked();
+                    onClicked:{
+                        Components.GlobalState.activePlayer = index;
+                    }
+                    Component.onCompleted:{
+                        console.log(Components.GlobalState.players.values[index].identity);
+                    }
                 }
             },
             Text{
+                Layout.fillWidth: false;
                 text: ">>";
+                signal clicked();
+                onClicked:{
+                    Components.GlobalState.nextPlayer();
+                }
             }
         ]
     }

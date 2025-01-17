@@ -50,7 +50,6 @@ CenterButtonStrip{
             width: Math.max(playerText.width, 200);
             height: childrenRect.height;
             color: Colour.trans;
-            property bool center: true;
             Text{
                 id: playerText;
                 property bool center: true;

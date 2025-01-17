@@ -185,7 +185,7 @@ Shape{
         }
     }
 
-    Row{
+    RowLayout{
         id: childContainer;
         height: childrenRect.height;
         anchors.verticalCenter: parent.verticalCenter;
