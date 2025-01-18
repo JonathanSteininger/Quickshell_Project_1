@@ -14,72 +14,94 @@ pragma ComponentBehavior: Bound
 Rectangle{
     id: root;
     width: 450;
-    height: playerSelector.enabled ? playerTile.height + playerSelector.height : playerTile.height;
+    height: container.height + 10;
     MouseArea{
         width: root.width;
         height: root.height;
     }
 
-    Components.CenterButtonStripLayout{
-        id: playerSelector;
-        width: parent.width;
-        centerIndex: (innerChildren.length-1)/2;
-        height: 40;
-        color: Components.Colour.accent;
-        borderColor: Components.Colour.fg;
-        borderSize: 1;
-        centerLine: true;
-        innerChildWidth: parent.width - spacing - height;
-        innerChildren: [
-            Text{
-                Layout.fillWidth: false;
-                text: "<<";
-                signal clicked();
-                onClicked:{
-                    Components.GlobalState.previousPlayer();
-                }
-            },
-            Repeater{
-                model: Components.GlobalState.players.values.length;
-                Rectangle{
-                    required property int index;
-                    Layout.fillWidth: true;
-                    height: childrenRect.height;
-                    color: Components.Colour.trans;
-                    Text{
-                        anchors.centerIn: parent;
-                        horizontalAlignment: Qt.AlignCenter;
-                        text:  Components.GlobalState.players.values[parent.index].identity.split(' ')[0];
-                    }
+    color: Components.Colour.trans;
+    Column{
+        id: container;
+        y: 5;
+        width: parent.width -10;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        spacing: 10;
+        height: childrenRect.height;
+        Components.CenterButtonStripLayout{
+            id: playerSelector;
+            width: parent.width;
+            centerIndex: (innerChildren.length-1)/2;
+            height: 40;
+            color: Components.Colour.accent;
+            borderColor: Components.Colour.bg_solid;
+            fillColor: Components.Colour._active;
+            borderSize: 2;
+            centerLine: Components.GlobalState.players.values.length % 2 == 0;
+            innerChildWidth: parent.width - spacing - height;
+            innerChildren: [
+                Text{
+                    Layout.fillWidth: false;
+                    text: "<<";
+                    color: Components.Colour.fg;
+                    font.pointSize: 20;
+                    font.bold: true;
+                    font.family: "Iosevka";
                     signal clicked();
                     onClicked:{
-                        Components.GlobalState.activePlayer = index;
+                        Components.GlobalState.previousPlayer();
                     }
-                    Component.onCompleted:{
-                        console.log(Components.GlobalState.players.values[index].identity);
+                },
+                Repeater{
+                    model: Components.GlobalState.players.values.length;
+                    Rectangle{
+                        required property int index;
+                        Layout.fillWidth: true;
+                        height: text.height;
+                        color: Components.Colour.trans;
+                        Text{
+                            color: Components.Colour.fg;
+                            font.bold: true;
+                            font.pointSize: 14;
+                            font.family: "Iosevka";
+                            id: text;
+                            anchors.centerIn: parent;
+                            horizontalAlignment: Qt.AlignCenter;
+                            text:  Components.GlobalState.players.values[parent.index].identity.split(' ')[0];
+                        }
+                        signal clicked();
+                        onClicked:{
+                            Components.GlobalState.activePlayer = index;
+                        }
+                        Component.onCompleted:{
+                            console.log(Components.GlobalState.players.values[index].identity);
+                        }
+                    }
+                },
+                Text{
+                    Layout.fillWidth: false;
+                    text: ">>";
+                    color: Components.Colour.fg;
+                    font.pointSize: 20;
+                    font.bold: true;
+                    font.family: "Iosevka";
+                    signal clicked();
+                    onClicked:{
+                        Components.GlobalState.nextPlayer();
                     }
                 }
-            },
-            Text{
-                Layout.fillWidth: false;
-                text: ">>";
-                signal clicked();
-                onClicked:{
-                    Components.GlobalState.nextPlayer();
-                }
-            }
-        ]
-    }
-    color: Components.Colour.trans;
-    Tiles.PlayerTile{
-        id: playerTile;
-        y: Components.GlobalState.players.values.length > 1 ? playerSelector.height : 0;
-        model: Components.GlobalState.activePlayerActual;
-        textColor: Components.Colour.fg;
-        boxColor: Components.Colour.accent;
-        backgroundColor: Components.Colour.trans;
-        usedBarColor: Components.Colour.accent;
-        emptyBarColor: Components.Colour.accent_dark;
-        activeColor: Components.Colour._active;
+            ]
+        }
+        Tiles.PlayerTile{
+            id: playerTile;
+            y: Components.GlobalState.players.values.length > 1 ? playerSelector.height : 0;
+            model: Components.GlobalState.activePlayerActual;
+            textColor: Components.Colour.fg;
+            boxColor: Components.Colour.accent;
+            backgroundColor: Components.Colour.trans;
+            usedBarColor: Components.Colour.accent;
+            emptyBarColor: Components.Colour.accent_dark;
+            activeColor: Components.Colour._active;
+        }
     }
 }
