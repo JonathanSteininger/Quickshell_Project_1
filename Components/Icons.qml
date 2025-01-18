@@ -31,10 +31,10 @@ Singleton{
     readonly property string battery_charging: `${iconPathLocal}battery-charging-vertical.svg`;
 
 
-    readonly property string play: `${iconPathLocal}play-circle-fill.svg`;
-    readonly property string pause: `${iconPathLocal}pause-circle-fill.svg`;
-    readonly property string next: `${iconPathLocal}skip-forward-circle-fill.svg`;
-    readonly property string prev: `${iconPathLocal}skip-back-circle-fill.svg`;
+    readonly property string play: `${iconPathLocal}play-fill.svg`;
+    readonly property string pause: `${iconPathLocal}pause-fill.svg`;
+    readonly property string next: `${iconPathLocal}skip-forward-fill.svg`;
+    readonly property string prev: `${iconPathLocal}skip-back-fill.svg`;
 
     readonly property string arrow_right: `${iconPathLocal}arrow-fat-right-fill.svg`;
     readonly property string arrow_left: `${iconPathLocal}arrow-fat-left-fill.svg`;
