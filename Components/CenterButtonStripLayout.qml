@@ -14,6 +14,7 @@ Shape{
     property alias innerChildren: childContainer.children;
     property bool tiltRight: true;
     property string borderColor: "black";
+    property string fillColor: borderColor;
     property string color: "white";
     property real borderSize: 2;
     property real tiltStrength: 1;
@@ -63,6 +64,14 @@ Shape{
             x: root.shift1;
         }
     }
+    Rectangle{
+        x: 0;
+        y: root.borderSize/2;
+        height: root.height - root.borderSize;
+        width: root.width;
+        color: Colour.trans;
+        anchors.centerIn: root;
+        clip: true;
     Shape{
         id: hoverShape
         property int childIndexBuffer: -1;
@@ -74,10 +83,11 @@ Shape{
         }
         property int usedChildIndex: childIndex != -1 ? childIndex : previousChildIndex;
         property real childWidth: root.innerChildren[usedChildIndex].width;
-        property real targetHeight: childIndex == -1 ? 0 : root.height;
+        property real targetHeight: childIndex == -1 ? 0 : height;
         property real shapeHeight: targetHeight;
         //width: childWidth + root.spacing;
         x: root.innerChildren[usedChildIndex].x;
+        y: 0;
         width: childWidth + height + root.spacing;
         height: root.height;
 
@@ -91,7 +101,7 @@ Shape{
         SimpleTest on shapeHeight{ }
         SimpleTest on x{ }
 
-        readonly property real shift: height * root.tiltStrength;
+        readonly property real shift: root.height * root.tiltStrength;
         readonly property real shift1: root.tiltRight ? shift : 0;
         readonly property real shift2: root.tiltRight ? 0 : shift;
 
@@ -136,7 +146,7 @@ Shape{
 
         ShapePath{
             strokeWidth: 0;
-            fillColor: root.borderColor;
+            fillColor: root.fillColor;
             startY: 0;
             startX: hoverShape.topLeft;
             PathLine{
@@ -157,6 +167,7 @@ Shape{
             }
         }
     }
+}
     Repeater{
         model: childContainer.children.length;
         Shape{
