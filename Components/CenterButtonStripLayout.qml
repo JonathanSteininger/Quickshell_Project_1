@@ -172,10 +172,10 @@ Shape{
         model: childContainer.children.length;
         Shape{
             required property int index;
-            visible: index >= 1 && innerChildren[index].width > 0;
+            visible: index >= 1 && innerChildren[index] != undefined ? innerChildren[index].width : 0 > 0;
             id: lineSplitter;
             height: parent.height;
-            x: root.innerChildren[index].x;
+            x: root.innerChildren[index] != undefined ? root.innerChildren[index].x : 0;
             readonly property real shift: height * root.tiltStrength;
             readonly property real shift2: root.centerIndexReal < index ? (root.tiltRight ? shift : 0) : (root.tiltRight ? 0 : shift);
             readonly property real shift1: root.centerIndexReal < index ? (root.tiltRight ? 0 : shift) : (root.tiltRight ? shift : 0);

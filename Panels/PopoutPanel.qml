@@ -17,6 +17,7 @@ PopupWindow{
     visible: true;
     color: Components.Colour.trans;
     mask: regionTop;
+    property alias cornerSize: stack.cornerSize;
 
     property string windowGravity: "right";
 

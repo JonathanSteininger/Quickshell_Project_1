@@ -85,11 +85,75 @@ Rectangle{
                     id: clippingMask2;
                     anchors.fill: parent;
                     visible: false;
-                    radius: 15;
+                    radius: 3;
                 }
             }
 
 
+            /*
+            Rectangle{
+                clip: true;
+                width: parent.width;
+                height: childrenRect.height;
+                color: player.backgroundColor;
+                Rectangle{
+                    height: childrenRect.height;
+                    anchors.verticalCenter: volumeBar.verticalCenter;
+                    anchors.right: volumeBar.left;
+                    color: player.backgroundColor;
+                    width: children[0].width + 10;
+                    Text{
+                        color: player.textColor;
+                        font.family: "Iosevka";
+                        anchors.centerIn: parent;
+                        text: `${Math.floor(player.model.volume*100)}%`;
+                    }
+                }
+                Components.Slider{
+                    width: parent.width * 0.80;
+                    anchors.horizontalCenter: parent.horizontalCenter;
+                    height: 25;
+                    visible: player.model.volumeSupported;
+                    id: volumeBar;
+                    textColor: player.textColor;
+                    barColor: player.boxColor;
+                    backgroundColor: player.backgroundColor;
+                    emptyColor: player.emptyBarColor;
+                    overShootColor: Components.Colour._active2;
+                    overShootLocation: 1.0;
+                    stepSize: 0.05;
+                    from: 0.0;
+                    value: player.model.volume;
+                    to: 1.5;
+                    textLeft: "";
+                    textRight: "";
+                    textPressed: `${Math.floor(value*100)}%`;
+                    font: "Iosevka";
+                    textSizeBottom: 12;
+                    textSizePressed: 10;
+                    onMoved: {
+                        if(!player.model.volumeSupported){
+                            value = player.model.volume;
+                            return;
+                        }
+                        player.model.volume = value;
+                    }
+                }
+                Rectangle{
+                    height: childrenRect.height;
+                    anchors.verticalCenter: volumeBar.verticalCenter;
+                    anchors.left: volumeBar.right;
+                    color: player.backgroundColor;
+                    width: children[0].width + 10;
+                    Text{
+                        color: player.textColor;
+                        font.family: "Iosevka";
+                        anchors.centerIn: parent;
+                        text: "150%";
+                    }
+                }
+            }
+            */
             ColumnLayout{
                 id: playerControls;
                 width: parent.width;
@@ -160,69 +224,126 @@ Rectangle{
                 }
             }
             Components.CenterButtonStripLayout{
-                height: 40;
+                height: 50;
                 color: Components.Colour.accent;
                 borderColor: Components.Colour.bg_solid;
                 fillColor: Components.Colour._active;
                 borderSize: 2;
                 tiltRight: false;
+                tiltStrength: 1;
                 centerIndex: 2;
                 innerChildWidth: parent.width - spacing - height;
                 innerChildren: [
-                    Text{
-                        text: "repeat";
-                        signal clicked();
+                    Components.SquaredIcon{
+                        icon: getIcon();
+                        function getIcon(){
+                            if(player.model.loopState == MprisLoopState.Track){
+                                return Components.Icons.repeat_track;
+                            }
+                            return Components.Icons.repeat;
+                        }
+                        function nextRepeat(){
+                            if(player.model.loopState == MprisLoopState.None){
+                                player.model.loopState = MprisLoopState.Track;
+                                return;
+                            }
+                            if(player.model.loopState == MprisLoopState.Track){
+                                player.model.loopState = MprisLoopState.Playlist;
+                                return;
+                            }
+                            player.model.loopState = MprisLoopState.None;
+                        }
+                        Shape{
+                            visible: player.model.loopState == MprisLoopState.None;
+                            anchors.centerIn: parent;
+                            width: parent.width - 10;
+                            height: parent.height - 10;
+                            id: strikeRepeat;
+                            ShapePath{
+                                strokeColor: player.textColor;
+                                strokeWidth: 2;
+                                startX: 0;
+                                startY: 0;
+                                PathLine{
+                                    x: strikeRepeat.width;
+                                    y: strikeRepeat.height;
+                                }
+                            }
+                        }
+                        onClicked: {
+                            nextRepeat();
+                        }
                     },
-                    Text{
-                        text: "Prev";
-                        signal clicked();
-                    },
-                    Text{
+                    Rectangle{
                         Layout.fillWidth: true;
-                        text: "play";
+                        Layout.horizontalStretchFactor: 2;
+                        height: playButton.height;
+                        color: Components.Colour.trans;
+                        Components.SquaredIcon{
+                            anchors.centerIn: parent;
+                            id: prevButton;
+                            icon: Components.Icons.prev;
+                        }
                         signal clicked();
+                        onClicked: {
+                            player.model.previous();
+                        }
                     },
-
-                    Text{
-                        text: "Next";
+                    Rectangle{
+                        Layout.fillWidth: true;
+                        Layout.horizontalStretchFactor: 3;
+                        height: playButton.height;
+                        color: Components.Colour.trans;
+                        Components.SquaredIcon{
+                            anchors.centerIn: parent;
+                            id: playButton;
+                            icon: player.model.isPlaying ? Components.Icons.pause : Components.Icons.play;
+                        }
                         signal clicked();
+                        onClicked: {
+                            player.model.togglePlaying();
+                        }
                     },
-                    Text{
-                        text: "shuffel";
+                    Rectangle{
+                        Layout.fillWidth: true;
+                        Layout.horizontalStretchFactor: 2;
+                        height: playButton.height;
+                        color: Components.Colour.trans;
+                        Components.SquaredIcon{
+                            anchors.centerIn: parent;
+                            id: nextButton;
+                            icon: Components.Icons.next;
+                        }
                         signal clicked();
+                        onClicked: {
+                            player.model.next();
+                        }
+                    },
+                    Components.SquaredIcon{
+                        icon: Components.Icons.shuffle;
+                        Shape{
+                            visible: !player.model.shuffle;
+                            anchors.centerIn: parent;
+                            width: parent.width - 10;
+                            height: parent.height - 10;
+                            id: strikeShuffle;
+                            ShapePath{
+                                strokeColor: player.textColor;
+                                strokeWidth: 2;
+                                startX: 0;
+                                startY: 0;
+                                PathLine{
+                                    x: strikeRepeat.width;
+                                    y: strikeRepeat.height;
+                                }
+                            }
+                        }
+                        onClicked:{
+                            player.model.shuffle = !player.model.shuffle;
+                        }
                     }
                 ]
 
-            }
-            Components.Slider{
-                width: parent.width * 0.8;
-                Layout.alignment: Qt.AlignCenter;
-                height: 50;
-                visible: player.model.volumeSupported;
-                id: volumeBar;
-                textColor: player.textColor;
-                barColor: player.boxColor;
-                backgroundColor: player.backgroundColor;
-                emptyColor: player.emptyBarColor;
-                overShootColor: Components.Colour._active2;
-                overShootLocation: 1.0;
-                stepSize: 0.05;
-                from: 0.0;
-                value: player.model.volume;
-                to: 1.5;
-                textLeft: player.model.volume;
-                textRight: "";
-                textPressed: value;
-                font: "Iosevka";
-                textSizeBottom: 12;
-                textSizePressed: 10;
-                onMoved: {
-                    if(!player.model.volumeSupported){
-                        value = player.model.volume;
-                        return;
-                    }
-                    player.model.volume = value;
-                }
             }
         }
     }

@@ -64,6 +64,7 @@ Rectangle{
                             font.bold: true;
                             font.pointSize: 14;
                             font.family: "Iosevka";
+                            font.underline: Components.GlobalState.activePlayer == parent.index;
                             id: text;
                             anchors.centerIn: parent;
                             horizontalAlignment: Qt.AlignCenter;

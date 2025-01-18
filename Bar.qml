@@ -64,6 +64,7 @@ Scope {
         currentPopout: Components.GlobalState.middle;
         popoutX: Components.GlobalState.middlePos.x;
         popoutY: Components.GlobalState.middlePos.y;
+        cornerSize: 50;
         windowGravity: "bottom";
         onChangeCurrentPopout: (value) => {
             Components.GlobalState.middle = value;
