@@ -34,25 +34,10 @@ ButtonStrip{
             width: 120;
             font.family: "Iosevka";
             font.pointSize: 14;
+            text: `${GlobalState.clock.hours%12}:${GlobalState.clock.minutes} ${GlobalState.clock.hours >=12 ? "PM" : "AM"}`;
             horizontalAlignment: Text.AlignHCenter;
             signal clicked();
             onClicked: () => GlobalState.popupLeft("time", leftPanel.convertPopoutPosition(x));
-            Process {
-                id: dateProc;
-                command: ["date", "+%r"];
-                running: true;
-                stdout: SplitParser {
-                    onRead: data => timer.text = data;
-                }
-            }
-            Timer{
-                interval: 1000;
-                running: true;
-                repeat: true;
-                onTriggered: {
-                    dateProc.running = true;
-                }
-            }
         }
     ]
     function manageWorkspaces(event) {
@@ -110,6 +95,7 @@ ButtonStrip{
                 innerChildren = innerChildren.slice(0, firstWorkspaceIndex);
             }
             innerChildren.push(...workspaceSections);
+            workspaceSectionsGarbage.forEach((child) => child.destroy());
             workspaceSectionsGarbage = [];
         }else{
             redrawCommitment.running = true;
