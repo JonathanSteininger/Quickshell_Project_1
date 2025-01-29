@@ -12,7 +12,7 @@ CenterButtonStrip{
     borderSize: 1;
     color: Colour.bg;
     tiltRight: false
-    centerIndex: 2;
+    centerIndex: 7;
     x: parent.width/2 - getCenter();
     function getCenter(){
         if(centerIndex < 0 || centerIndex >= innerChildren.length){
@@ -34,6 +34,41 @@ CenterButtonStrip{
     innerChildren:[
         Text{
             text: "1";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
+            }
+        },
+        Text{
+            text: "2";
             signal clicked();
             onClicked: () => {
                 GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));

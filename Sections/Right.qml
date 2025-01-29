@@ -55,6 +55,15 @@ ButtonStrip{
                 color: Colour.trans;
                 signal clicked();
                 onClicked: () => modelData.activate();
+                signal rightClicked();
+                onRightClicked: {
+                    if(modelData.menu == null){
+                        return;
+                    }
+                    console.log(modelData.menu);
+                    GlobalState.activeSysTrayMenu = modelData.menu;
+                    GlobalState.popupRight("tray_menu", rightPanel.convertPopoutPosition(x,width));
+                }
                 ColorOverlay{
                     anchors.fill: image;
                     source: image;
