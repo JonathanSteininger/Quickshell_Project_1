@@ -11,7 +11,8 @@ Scope {
     PanelWindow {
         id: test;
         color: "#00000000";
-        screen: Quickshell.screens[0];
+        //looks for DP-1 otherwise uses first monitor in list. 
+        screen: Quickshell.screens.filter((monitor) => monitor.name == "DP-1") != [] ? Quickshell.screens.filter((monitor) => monitor.name == "DP-1") : Quickshell.screens[0];
         height: 60;
         anchors {
             top: true
@@ -80,6 +81,7 @@ Scope {
         Panels.Player{}
     }
 
+    //rightPanel
     Panels.PopoutPanel{
         anchor.window: test;
         anchor.edges: Edges.Bottom | Edges.Right;
@@ -101,6 +103,8 @@ Scope {
         }
         anchor.rect.y: -6;
         Panels.Audio {}
-        Panels.Time {}
+        Panels.SystemTrayMenu {
+            menuData: Components.GlobalState.activeSysTrayMenu == null ? Components.GlobalState.blankTrayMenu : Components.GlobalState.activeSysTrayMenu;
+        }
     }
 }
