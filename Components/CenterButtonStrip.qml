@@ -199,8 +199,12 @@ Shape{
     MouseArea{
         anchors.fill: parent;
         hoverEnabled: true;
-        onReleased: {
-            parent.clickChild(mouseX, mouseY);
+        onReleased: (mouseEvent) => {
+            if(mouseEvent.button == Qt.LeftButton){
+                parent.clickChild(mouseX, mouseY);
+            } else if (mouseEvent.button == Qt.RightButton){
+                parent.clickAltChild(mouseX, mouseY);
+            }
         }
         onPositionChanged: {
             parent.checkChildrenHover(mouseX, mouseY);
@@ -247,6 +251,15 @@ Shape{
         }
     }
 
+    function clickAltChild(_x, _y){
+        var index = checkPosInBounds(_x, _y);
+        if (index != -1){
+            if(innerChildren[index].onRightClicked== undefined){
+                return;
+            }
+            innerChildren[index].rightClicked();
+        }
+    }
 
     function checkPosInBounds(mouseX, _y): int{
         var _x = mouseX;

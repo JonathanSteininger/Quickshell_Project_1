@@ -4,11 +4,10 @@ import Quickshell
 import QtQuick
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
+import Quickshell.Services.SystemTray
 
 Singleton {
     property int popupOffset: 8;
-
-
 
     function popupLeft(id: string, x: int): void{
         var lower = id.toLowerCase();
@@ -57,6 +56,7 @@ Singleton {
         rightPos.y = popupOffset;
         left= -1;
         middle= -1;
+        console.log(right);
     }
     property int right: -1;
     property bool showRight: false;
@@ -64,9 +64,11 @@ Singleton {
 
     property list<string> rightMap:[
         "audio",
-        "time",
-        "brightness"
+        "tray_menu"
     ]
+
+    property var blankTrayMenu: null;
+    property var activeSysTrayMenu: null;
 
 
 
@@ -165,5 +167,13 @@ Singleton {
             return;
         }
         activePlayer--;
+    }
+
+
+
+
+    property SystemClock clock: SystemClock{ 
+        enabled: true;
+        precision: SystemClock.Seconds;
     }
 }
