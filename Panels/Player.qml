@@ -15,6 +15,7 @@ Rectangle{
     id: root;
     width: 450;
     height: container.height + 10;
+    property real playerCycleSize: 16;
     MouseArea{
         width: root.width;
         height: root.height;
@@ -44,7 +45,7 @@ Rectangle{
                     Layout.fillWidth: false;
                     text: "<<";
                     color: Components.Colour.fg;
-                    font.pointSize: 20;
+                    font.pointSize: root.playerCycleSize;
                     font.bold: true;
                     font.family: "Iosevka";
                     signal clicked();
@@ -83,7 +84,7 @@ Rectangle{
                     Layout.fillWidth: false;
                     text: ">>";
                     color: Components.Colour.fg;
-                    font.pointSize: 20;
+                    font.pointSize: root.playerCycleSize;
                     font.bold: true;
                     font.family: "Iosevka";
                     signal clicked();
@@ -103,6 +104,7 @@ Rectangle{
             usedBarColor: Components.Colour.accent;
             emptyBarColor: Components.Colour.accent_dark;
             activeColor: Components.Colour._active;
+            iconSize: 24;
         }
     }
 }

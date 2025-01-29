@@ -33,6 +33,7 @@ Rectangle{
     required property string boxColor;
     required property string usedBarColor;
     required property string emptyBarColor;
+    property real iconSize: 28;
     property string backupPicture: `root:Images/no_art.jpg`;
     Rectangle{
         id: container;
@@ -234,45 +235,52 @@ Rectangle{
                 centerIndex: 2;
                 innerChildWidth: parent.width - spacing - height;
                 innerChildren: [
-                    Components.SquaredIcon{
-                        icon: getIcon();
-                        function getIcon(){
-                            if(player.model.loopState == MprisLoopState.Track){
-                                return Components.Icons.repeat_track;
+                    Rectangle{
+                        width: 32;
+                        height: childrenRect.height;
+                        color: player.backgroundColor;
+                        Components.SquaredIcon{
+                            icon: getIcon();
+                            function getIcon(){
+                                if(player.model.loopState == MprisLoopState.Track){
+                                    return Components.Icons.repeat_track;
+                                }
+                                return Components.Icons.repeat;
                             }
-                            return Components.Icons.repeat;
-                        }
-                        function nextRepeat(){
-                            if(player.model.loopState == MprisLoopState.None){
-                                player.model.loopState = MprisLoopState.Track;
-                                return;
-                            }
-                            if(player.model.loopState == MprisLoopState.Track){
-                                player.model.loopState = MprisLoopState.Playlist;
-                                return;
-                            }
-                            player.model.loopState = MprisLoopState.None;
-                        }
-                        Shape{
-                            visible: player.model.loopState == MprisLoopState.None;
-                            anchors.centerIn: parent;
-                            width: parent.width - 10;
-                            height: parent.height - 10;
-                            id: strikeRepeat;
-                            ShapePath{
-                                strokeColor: player.textColor;
-                                strokeWidth: 2;
-                                startX: 0;
-                                startY: 0;
-                                PathLine{
-                                    x: strikeRepeat.width;
-                                    y: strikeRepeat.height;
+                            height: player.iconSize;
+                            Shape{
+                                visible: player.model.loopState == MprisLoopState.None;
+                                anchors.centerIn: parent;
+                                width: parent.width - 10;
+                                height: parent.height - 10;
+                                id: strikeRepeat;
+                                ShapePath{
+                                    strokeColor: player.textColor;
+                                    strokeWidth: 2;
+                                    startX: 0;
+                                    startY: 0;
+                                    PathLine{
+                                        x: strikeRepeat.width;
+                                        y: strikeRepeat.height;
+                                    }
                                 }
                             }
                         }
-                        onClicked: {
-                            nextRepeat();
-                        }
+                            function nextRepeat(){
+                                if(player.model.loopState == MprisLoopState.None){
+                                    player.model.loopState = MprisLoopState.Track;
+                                    return;
+                                }
+                                if(player.model.loopState == MprisLoopState.Track){
+                                    player.model.loopState = MprisLoopState.Playlist;
+                                    return;
+                                }
+                                player.model.loopState = MprisLoopState.None;
+                            }
+                        signal clicked();
+                            onClicked: {
+                                nextRepeat();
+                            }
                     },
                     Rectangle{
                         Layout.fillWidth: true;
@@ -280,6 +288,7 @@ Rectangle{
                         height: playButton.height;
                         color: Components.Colour.trans;
                         Components.SquaredIcon{
+                            height: player.iconSize;
                             anchors.centerIn: parent;
                             id: prevButton;
                             icon: Components.Icons.prev;
@@ -295,6 +304,7 @@ Rectangle{
                         height: playButton.height;
                         color: Components.Colour.trans;
                         Components.SquaredIcon{
+                            height: player.iconSize;
                             anchors.centerIn: parent;
                             id: playButton;
                             icon: player.model.isPlaying ? Components.Icons.pause : Components.Icons.play;
@@ -310,6 +320,7 @@ Rectangle{
                         height: playButton.height;
                         color: Components.Colour.trans;
                         Components.SquaredIcon{
+                            height: player.iconSize;
                             anchors.centerIn: parent;
                             id: nextButton;
                             icon: Components.Icons.next;
@@ -319,25 +330,33 @@ Rectangle{
                             player.model.next();
                         }
                     },
-                    Components.SquaredIcon{
-                        icon: Components.Icons.shuffle;
-                        Shape{
-                            visible: !player.model.shuffle;
+                    Rectangle{
+                        width: 32;
+                        height: childrenRect.height;
+                        color: player.backgroundColor;
+                        Components.SquaredIcon{
                             anchors.centerIn: parent;
-                            width: parent.width - 10;
-                            height: parent.height - 10;
-                            id: strikeShuffle;
-                            ShapePath{
-                                strokeColor: player.textColor;
-                                strokeWidth: 2;
-                                startX: 0;
-                                startY: 0;
-                                PathLine{
-                                    x: strikeRepeat.width;
-                                    y: strikeRepeat.height;
+                            icon: Components.Icons.shuffle;
+                            height: player.iconSize;
+                            Shape{
+                                visible: !player.model.shuffle;
+                                anchors.centerIn: parent;
+                                width: parent.width - 10;
+                                height: parent.height - 10;
+                                id: strikeShuffle;
+                                ShapePath{
+                                    strokeColor: player.textColor;
+                                    strokeWidth: 2;
+                                    startX: 0;
+                                    startY: 0;
+                                    PathLine{
+                                        x: strikeRepeat.width;
+                                        y: strikeRepeat.height;
+                                    }
                                 }
                             }
                         }
+                        signal clicked();
                         onClicked:{
                             player.model.shuffle = !player.model.shuffle;
                         }
