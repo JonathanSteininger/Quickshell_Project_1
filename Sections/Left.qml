@@ -34,7 +34,7 @@ ButtonStrip{
             width: 120;
             font.family: "Iosevka";
             font.pointSize: 14;
-            text: `${`0${GlobalState.clock.hours%12}`.substr(-2)}:${`0${GlobalState.clock.minutes}`.substr(-2)} ${GlobalState.clock.hours >=12 ? "PM" : "AM"}`;
+            text: `${`0${GlobalState.clock.hours%12 == 0 ? 12 : GlobalState.clock.hours%12 }`.substr(-2)}:${`0${GlobalState.clock.minutes}`.substr(-2)} ${GlobalState.clock.hours >=12 ? "PM" : "AM"}`;
             horizontalAlignment: Text.AlignHCenter;
             signal clicked();
             onClicked: () => GlobalState.popupLeft("time", leftPanel.convertPopoutPosition(x));
