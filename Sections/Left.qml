@@ -26,6 +26,10 @@ ButtonStrip{
         //-15 because thats the popout windows corner.
         return shift + xpos -15;
     }
+    SystemClock{
+        id: clock;
+        precision: SystemClock.Seconds;
+    }
 
     innerChildren: [
         Text{
@@ -34,7 +38,7 @@ ButtonStrip{
             width: 120;
             font.family: "Iosevka";
             font.pointSize: 14;
-            text: `${`0${GlobalState.clock.hours%12 == 0 ? 12 : GlobalState.clock.hours%12 }`.substr(-2)}:${`0${GlobalState.clock.minutes}`.substr(-2)} ${GlobalState.clock.hours >=12 ? "PM" : "AM"}`;
+            text: Qt.formatDateTime(GlobalState.clock.date, "h:mm:ss AP");
             horizontalAlignment: Text.AlignHCenter;
             signal clicked();
             onClicked: () => GlobalState.popupLeft("time", leftPanel.convertPopoutPosition(x));
@@ -85,7 +89,11 @@ ButtonStrip{
         element.wid = workspace_id;
         element.wname = workspace_name;
         var insertindex = workspaceSections.findIndex((child) => child.wid > element.wid);
-        workspaceSections.splice(insertindex, 0, element);
+        if(insertindex == -1){
+            workspaceSections.push(element);
+        }else{
+            workspaceSections.splice(insertindex, 0, element);
+        }
         updateWorkspaces();
     }
     function updateWorkspaces(commited = false){

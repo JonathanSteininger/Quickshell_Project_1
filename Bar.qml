@@ -106,5 +106,6 @@ Scope {
         Panels.SystemTrayMenu {
             menuData: Components.GlobalState.activeSysTrayMenu == null ? Components.GlobalState.blankTrayMenu : Components.GlobalState.activeSysTrayMenu;
         }
+        Panels.Brightness{}
     }
 }

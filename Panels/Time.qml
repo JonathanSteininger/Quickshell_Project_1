@@ -7,7 +7,8 @@ Rectangle{
     width: 200;
     height: 50;
     Text{
+        anchors.centerIn: parent;
         color: Components.Colour.fg;
-        text: "time box";
+        text: Qt.formatDateTime(Components.GlobalState.clock.date, "dddd d - MMMM");
     }
 }

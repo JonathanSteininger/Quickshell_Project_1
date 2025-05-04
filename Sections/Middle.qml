@@ -12,7 +12,7 @@ CenterButtonStrip{
     borderSize: 1;
     color: Colour.bg;
     tiltRight: false
-    centerIndex: 7;
+    centerIndex: 0;
     x: parent.width/2 - getCenter();
     function getCenter(){
         if(centerIndex < 0 || centerIndex >= innerChildren.length){
@@ -32,55 +32,6 @@ CenterButtonStrip{
         return output - centerPosition;
     }
     innerChildren:[
-        Text{
-            text: "1";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
-        Text{
-            text: "2";
-            signal clicked();
-            onClicked: () => {
-                GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
-            }
-        },
         Rectangle{
             width: Math.max(playerText.width, 200);
             height: childrenRect.height;
@@ -92,17 +43,13 @@ CenterButtonStrip{
                 anchors.horizontalCenter: parent.horizontalCenter;
                 horizontalAlignment: Text.AlignLeft;
                 text: GlobalState.activePlayerActual.trackTitle;
-                width: Math.min(implicitWidth, 400);
+                width: Math.min(implicitWidth, 600);
                 clip: true;
             }
             signal clicked()
             onClicked: () => {
                 GlobalState.popupMiddle("player", root.convertPopoutPosition(x, width));
             }
-        },
-        Text{
-            text: "3";
-            signal clicked();
         }
     ]
 

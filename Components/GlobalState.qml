@@ -64,7 +64,8 @@ Singleton {
 
     property list<string> rightMap:[
         "audio",
-        "tray_menu"
+        "tray_menu",
+        "brightness"
     ]
 
     property var blankTrayMenu: null;
@@ -145,6 +146,7 @@ Singleton {
         Mpris.players.objectRemovedPost.connect(validatePlayerIndex);
         Mpris.players.objectInsertedPost.connect(validatePlayerIndex);
     }
+
     function validatePlayerIndex(object, index){
         if(activePlayer >= playerAmount){
             activePlayer = playerAmount-1;
@@ -173,7 +175,18 @@ Singleton {
 
 
     property SystemClock clock: SystemClock{ 
-        enabled: true;
         precision: SystemClock.Seconds;
     }
+
+
+
+
+    //workaround for brightness controls. 
+    //apple cinnema displays use usb bus.
+    //a tool like acdcontrol is used to control it. 
+    //but it needs the path to the device. Maybe in the future I will find this dynamically.
+    //By writing a dbus service that is in this repo.
+    property var appleCinamaDisplays: [
+        "/dev/usb/hiddev1"
+    ]
 }

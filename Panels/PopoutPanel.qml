@@ -47,6 +47,7 @@ PopupWindow{
     }
 
     signal changeCurrentPopout(value:int)
+    
     signal changeVisibility(value:bool)
     signal changePos(x:int,y:int)
 

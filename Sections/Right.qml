@@ -25,7 +25,7 @@ ButtonStrip{
     innerChildren: [
         SquaredIcon{
             icon: Icons.brightness;
-            onClicked: console.log("brightness");
+            onClicked: GlobalState.popupRight("brightness", rightPanel.convertPopoutPosition(x, width));
         },
         SquaredIcon{
             icon: Icons.network_up;
@@ -65,6 +65,7 @@ ButtonStrip{
                     GlobalState.popupRight("tray_menu", rightPanel.convertPopoutPosition(x,width));
                 }
                 ColorOverlay{
+                    visible: false
                     anchors.fill: image;
                     source: image;
                     color: Colour.fg;
