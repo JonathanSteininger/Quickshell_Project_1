@@ -9,149 +9,189 @@ import "../Components/" as Components
 import Quickshell.Services.Pipewire
 
 Rectangle{
-    id: root;
-    color: Components.Colour.trans;
-    width: 300;
-    property real manualGap: 8;
-    height: frame.height + manualGap * 2;
-    property real maxHeight: 800;
-    property PwObjectTracker tracker: Components.GlobalState.tracker;
-    //can set default icons for specific audio outputs
-    property var iconMap: {
-        "M Series Headphone + Monitor Out": Components.Icons.headphones,
-        "Built-in Audio Analog Stereo": Components.Icons.speaker,
-        "Vega 20 HDMI Audio [Radeon VII] Digital Stereo (HDMI)": Components.Icons.display,
-    }
-    function getIcon(name:string):string{
-        //var index = root.iconMap.findIndex((child) => child.key.includes(name))
-        var icon = iconMap[name];
-        if (icon == undefined){
-            return Components.Icons.speaker_unknown;
-        }
-        return icon;
-    }
-    clip: false
-    MouseArea{
-        width: root.width;
-        height: root.height;
-    }
-    component LineBehavior: Behavior{
-        PropertyAnimation{
-            duration: 200;
-            easing.type: Easing.InOutQuad;
-        }
-    }
-    component SoundTile: Rectangle{
-        id: item
-        width: frame.width;
-        required property PwNodeAudio audioNode;
-        height: 100;
-        clip: true;
-        required property string nodeName;
-        required property string nodeTitle;
-        required property string nodeId;
-        required property var activeColor;
-        required property var activeSecondaryColor;
-        required property var activeSliderColor;
-        required property var activeTextColor;
-        required property var activeBackgroundColor;
-        required property var fontFamily;
-        property var icon: Components.Icons.speaker_unknown;
-        property bool isDevice: false;
-        border.width: 2;
-        radius: 2;
-        MouseArea{
-            anchors.fill: item;
-            onClicked:{
-                if(item.isDevice){
-                    Components.GlobalState.setNodeDefault(item.nodeName, item.nodeId);
-                }
-            }
-        }
-        Rectangle{
-            property int padding: 5;
-            width: parent.width - padding*2;
-            height: parent.height - padding*2;
-            x: padding;
-            y: padding;
-            color: Components.Colour.trans;
-            Components.SquaredIcon{
-                id: icon;
-                icon: item.icon;
-                height: 32;
-            }
-            Text {
-                anchors.top: parent.top;
-                width: parent.width - icon.width;
-                anchors.left: icon.right;
-                anchors.bottom: slider.top;
-                //verticalAlignment: Text.AlignVCenter;
-                color: item.activeTextColor;
-                font.family: item.fontFamily;
-                font.pointSize: 12;
-                wrapMode: Text.WordWrap;
-                text: item.nodeTitle;
-            }
-            Components.Slider{
-                id: slider;
-                textColor: item.activeTextColor;
-                barColor: item.activeColor;
-                width: parent.width;
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.horizontalCenter: parent.horizontalCenter;
-                backgroundColor: item.activeBackgroundColor;
-                emptyColor: item.activeSliderColor;
-                overShootColor: item.activeSecondaryColor;
-                overShootLocation: 1.0;
-                stepSize: 0.05;
-                value: item.audioNode.volume;
-                from: 0;
-                to: 1.5;
-                textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
-                textRight: "";
-                textPressed: `${Math.round(value * 1000)/10}%`;
-                font: "Iosevka";
-                textSizeBottom: 12;
-                textSizePressed: 10;
-                onMoved: {
-                    item.audioNode.volume = value;
-                }
-            }
-            Rectangle{
-                height: 28;
-                width: 40;
-                color: item.audioNode != null ? (item.audioNode.muted ? item.activeColor : item.activeBackgroundColor) : item.activeBackgroundColor;
-                border.width: 1;
-                border.color: item.activeColor;
-                radius: 3;
-                anchors.bottom: parent.bottom;
-                anchors.right: parent.right;
-                Behavior on color{
-                    ColorAnimation {
-                        duration: 100;
-                    }
-                }
-                MouseArea{
-                    anchors.fill: parent;
-                    hoverEnabled: true;
-                    onClicked: {
-                        item.audioNode.muted = !item.audioNode.muted;
-                    }
-                }
-                Components.SquaredIcon{
-                    anchors.centerIn: parent;
-                    icon: Components.Icons.volume_mute;
-                    height: 20;
-                    iconColor: item.audioNode.muted ? item.activeSliderColor : item.activeTextColor;
-                    Behavior on iconColor{
-                        ColorAnimation {
-                            duration: 100;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	id: root;
+	color: Components.Colour.trans;
+	width: 300;
+	property real manualGap: 8;
+	height: frame.height + manualGap * 2;
+	property real maxHeight: 800;
+	property PwObjectTracker tracker: Components.GlobalState.tracker;
+	//can set default icons for specific audio outputs
+	property var iconMap: {
+		"M Series Headphone + Monitor Out": Components.Icons.headphones,
+		"Built-in Audio Analog Stereo": Components.Icons.speaker,
+		"Vega 20 HDMI Audio [Radeon VII] Digital Stereo (HDMI)": Components.Icons.display,
+	}
+	function getIcon(name:string):string{
+		//var index = root.iconMap.findIndex((child) => child.key.includes(name))
+		var icon = iconMap[name];
+		if (icon == undefined){
+			return Components.Icons.speaker_unknown;
+		}
+		return icon;
+	}
+	clip: false
+	MouseArea{
+		width: root.width;
+		height: root.height;
+	}
+	component LineBehavior: Behavior{
+		PropertyAnimation{
+			duration: 200;
+			easing.type: Easing.InOutQuad;
+		}
+	}
+	component SoundTile: Rectangle{
+		id: item
+		width: frame.width;
+		required property PwNodeAudio audioNode;
+		height: 100;
+		clip: true;
+		required property string nodeName;
+		required property string nodeTitle;
+		required property string nodeId;
+		required property var activeColor;
+		required property var activeSecondaryColor;
+		required property var activeSliderColor;
+		required property var activeTextColor;
+		required property var activeBackgroundColor;
+		required property var fontFamily;
+		property var icon: Components.Icons.speaker_unknown;
+		property bool isDevice: false;
+		border.width: 2;
+		radius: 2;
+		MouseArea{
+			anchors.fill: item;
+			onClicked:{
+				if(item.isDevice){
+					Components.GlobalState.setNodeDefault(item.nodeName, item.nodeId);
+				}
+			}
+		}
+		Rectangle{
+			property int padding: 5;
+			width: parent.width - padding*2;
+			height: parent.height - padding*2;
+			x: padding;
+			y: padding;
+			color: Components.Colour.trans;
+			Components.SquaredIcon{
+				id: icon;
+				icon: item.icon;
+				height: 32;
+			}
+			Text {
+				anchors.top: parent.top;
+				width: parent.width - icon.width;
+				anchors.left: icon.right;
+				anchors.bottom: slider.top;
+				//verticalAlignment: Text.AlignVCenter;
+				color: item.activeTextColor;
+				font.family: item.fontFamily;
+				font.pointSize: 12;
+				wrapMode: Text.WordWrap;
+				text: item.nodeTitle;
+			}
+			Components.Slider{
+				id: slider;
+				textColor: item.activeTextColor;
+				barColor: item.activeColor;
+				width: parent.width;
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.horizontalCenter: parent.horizontalCenter;
+				backgroundColor: item.activeBackgroundColor;
+				emptyColor: item.activeSliderColor;
+				overShootColor: item.activeSecondaryColor;
+				overShootLocation: 1.0;
+				stepSize: 0.05;
+				value: item.audioNode.volume;
+				from: 0;
+				to: 1.5;
+				textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
+				textRight: "";
+				textPressed: `${Math.round(value * 1000)/10}%`;
+				font: "Iosevka";
+				textSizeBottom: 12;
+				textSizePressed: 10;
+				onMoved: {
+					item.audioNode.volume = value;
+				}
+			}
+			Rectangle{
+				height: 28;
+				width: 40;
+				color: item.audioNode != null ? (item.audioNode.muted ? item.activeColor : item.activeBackgroundColor) : item.activeBackgroundColor;
+				border.width: 1;
+				border.color: item.activeColor;
+				radius: 3;
+				anchors.bottom: parent.bottom;
+				anchors.right: parent.right;
+				Behavior on color{
+					ColorAnimation {
+						duration: 100;
+					}
+				}
+				MouseArea{
+					anchors.fill: parent;
+					hoverEnabled: true;
+					onClicked: {
+						item.audioNode.muted = !item.audioNode.muted;
+					}
+				}
+				Components.SquaredIcon{
+					anchors.centerIn: parent;
+					icon: Components.Icons.volume_mute;
+					height: 20;
+					iconColor: item.audioNode.muted ? item.activeSliderColor : item.activeTextColor;
+					Behavior on iconColor{
+						ColorAnimation {
+							duration: 100;
+						}
+					}
+				}
+			}
+			ColumnLayout{
+				width: parent.width;
+				Repeater{
+					model: item.audioNode.channels.length;
+					delegate: Rectangle{
+						color: "transparent";
+						width: parent.width;
+						height: childrenRect.height;
+						required property int index;
+						Text{
+							text: `${parent.index} ${Math.floor(100*item.audioNode.volumes[parent.index])} ${item.audioNode.channels[parent.index]}`;
+							color: "white";
+						}
+						Components.Slider{
+							textColor: item.activeTextColor;
+							barColor: item.activeColor;
+							width: parent.width;
+							anchors.verticalCenter: parent.verticalCenter;
+							anchors.horizontalCenter: parent.horizontalCenter;
+							backgroundColor: item.activeBackgroundColor;
+							emptyColor: item.activeSliderColor;
+							overShootColor: item.activeSecondaryColor;
+							overShootLocation: 1.0;
+							stepSize: 0.05;
+							value: item.audioNode.volumes[parent.index];
+							from: 0;
+							to: 1.5;
+							textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
+							textRight: "";
+							textPressed: `${Math.round(value * 1000)/10}%`;
+							font: "Iosevka";
+							textSizeBottom: 12;
+							textSizePressed: 10;
+							onMoved: {
+								item.audioNode.volumes[parent.index] = value;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
     Rectangle{
         id: frame;
         x: root.manualGap;
@@ -182,7 +222,7 @@ Rectangle{
                     nodeName: name;
                     nodeId: id;
                     nodeTitle: nodeName;
-                    height: 100;
+                    height: 180;
                     clip: true;
                     activeColor: Components.Colour.accent;
                     activeSecondaryColor: Components.Colour._active2;
@@ -237,7 +277,7 @@ Rectangle{
                     nodeId: id;
                     nodeTitle: description;
                     isDevice: true;
-                    height: 100;
+                    height: 180;
                     clip: true;
                     icon: root.getIcon(description);
                     activeColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active : Components.Colour.accent) : "white";
