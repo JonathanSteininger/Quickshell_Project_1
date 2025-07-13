@@ -5,8 +5,9 @@ import QtQuick.Controls
 
 Rectangle{
     id: root;
-    color: "#00000000";
-    height: 80;
+    color: Colour.trans;
+	height: sliderContainer.childrenRect.height;
+	clip: false;
     required property string backgroundColor;
     required property string textColor;
     required property string barColor;
@@ -47,101 +48,112 @@ Rectangle{
             text: root.textPressed;
         }
     }
-    Slider{
-        id: slider;
-        width: root.width;
-        height: 10;
-        anchors.verticalCenter: parent.verticalCenter;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        snapMode: root.stepSize == 0 ? Slider.NoSnap : Slider.SnapAlways;
-        stepSize: root.stepSize;
-        onMoved: {
-            root.moved();
-        }
-        background: Rectangle{
-            x: slider.leftPaddingChanged;
-            y: slider.topPadding + slider.availableHeight /2 - height /2;
-            implicitHeight: 5;
-            implicitWidth: 200;
-            width: slider.availableWidth;
-            height: slider.availableHeight;
-            radius: 5;
-            color: Colour.trans;
-            Rectangle{
-                height: parent.height;
-                width: parent.width /3 * 2;
-                x: 0;
-                color: root.emptyColor;
-                bottomLeftRadius: parent.radius;
-                topLeftRadius: parent.radius;
-            }
-            Rectangle{
-                height: parent.height;
-                property real shift: 0.2;
-                width: parent.width /3 * (1 + shift) - slider.handle.width/2;
-                x: parent.width /3 * (2 - shift) + slider.handle.width/2;
-                gradient: Gradient{
-                    orientation: Gradient.Horizontal;
-                    GradientStop{ position: 0.0; color: root.emptyColor}
-                    GradientStop{ position: 0.4; color: root.overShootColor}
-                    GradientStop{ position: 1.0; color: root.overShootColor}
-                }
-                bottomRightRadius: parent.radius;
-                topRightRadius: parent.radius;
-            }
-            Rectangle{
-                height: parent.height;
-                width: slider.handle.x + slider.handle.width/2;
-                x: 0;
-                color: root.barColor;
-                bottomLeftRadius: parent.radius;
-                topLeftRadius: parent.radius;
-            }
-            Rectangle{
-                height: parent.height;
-                width: parent.width;
-                x: 0;
-                border.width: 1;
-                border.color: root.barColor;
-                color: Colour.trans;
-                radius: parent.radius;
-            }
-            Repeater{
-                id: lines;
-                property int steps: (slider.to - slider.from) / slider.stepSize;
-                model: root.stepSize == 0 || disableBars ? 0 : (steps + 1);
-                Rectangle{
-                    required property int index;
-                    property int extra: index % Math.round(lines.steps/3*2) == 0? 3 : 0;
-                    property int selectedExtra: 5;
-                    width: 2;
-                    implicitHeight: index % 5 == 0 ? 8: 5;
-                    height: (Math.round(lines.steps*slider.position) == index ? implicitHeight + selectedExtra : implicitHeight) + extra;
-                    color: Math.round(lines.steps*slider.position) >= index ? root.barColor : root.overShootColor;
-                    LineBehavior on color{}
-                    LineBehavior on height{}
-                    x: (parent.width - slider.handle.width) / lines.steps * index + slider.handle.width/2;
-                    y: parent.y + parent.height + 3;
-                }
-            }
-
-        }
-        handle: Rectangle{
-            implicitWidth: 10;
-            implicitHeight: 10;
-            color: root.barColor;
-            border.width: 1;
-            border.color: root.emptyColor;
-            height: implicitHeight + 4;
-            width: implicitWidth + 4;
-            anchors.verticalCenter: slider.verticalCenter;
-            radius: 10;
-            x: (slider.width - width) * slider.position + 0.5;
-        }
-    }
+	ColumnLayout{
+		id: sliderContainer;
+		width: root.width;
+		spacing: 3;
+		Slider{
+			id: slider;
+			Layout.fillWidth: true;
+			height: 10;
+			snapMode: root.stepSize == 0 ? Slider.NoSnap : Slider.SnapAlways;
+			stepSize: root.stepSize;
+			onMoved: {
+				root.moved();
+			}
+			background: Rectangle{
+				id: sliderPart;
+				x: slider.leftPaddingChanged;
+				y: slider.topPadding + slider.availableHeight /2 - height /2;
+				implicitHeight: 5;
+				implicitWidth: 200;
+				width: slider.availableWidth;
+				height: slider.availableHeight;
+				radius: 5;
+				color: Colour.trans;
+				// this shit is so ass. just use a single gradient with stops dummy.
+				//left fill
+				Rectangle{
+					height: parent.height;
+					width: parent.width /3 * 2;
+					x: 0;
+					color: root.emptyColor;
+					bottomLeftRadius: parent.radius;
+					topLeftRadius: parent.radius;
+				}
+				//right fill
+				Rectangle{
+					height: parent.height;
+					property real shift: 0.2;
+					width: parent.width /3 * (1 + shift) - slider.handle.width/2;
+					x: parent.width /3 * (2 - shift) + slider.handle.width/2;
+					gradient: Gradient{
+						orientation: Gradient.Horizontal;
+						GradientStop{ position: 0.0; color: root.emptyColor}
+						GradientStop{ position: 0.4; color: root.overShootColor}
+						GradientStop{ position: 1.0; color: root.overShootColor}
+					}
+					bottomRightRadius: parent.radius;
+					topRightRadius: parent.radius;
+				}
+				// active fill rectangle
+				Rectangle{
+					height: parent.height;
+					width: slider.handle.x + slider.handle.width/2;
+					x: 0;
+					color: root.barColor;
+					bottomLeftRadius: parent.radius;
+					topLeftRadius: parent.radius;
+				}
+				// border?
+				Rectangle{
+					height: parent.height;
+					width: parent.width;
+					x: 0;
+					border.width: 1;
+					border.color: root.barColor;
+					color: Colour.trans;
+					radius: parent.radius;
+				}
+			}
+			handle: Rectangle{
+				implicitWidth: 10;
+				implicitHeight: 10;
+				color: root.barColor;
+				border.width: 1;
+				border.color: root.emptyColor;
+				height: implicitHeight + 4;
+				width: implicitWidth + 4;
+				anchors.verticalCenter: slider.verticalCenter;
+				radius: 10;
+				x: (slider.width - width) * slider.position + 0.5;
+			}
+		}
+		Item{
+			Layout.fillWidth: true;
+			height: 8;
+			Repeater{
+				id: lines;
+				property int steps: (slider.to - slider.from) / slider.stepSize;
+				model: root.stepSize == 0 || disableBars ? 0 : (steps + 1);
+				Rectangle{
+					required property int index;
+					property int extra: index % Math.round(lines.steps/3*2) == 0? 3 : 0;
+					property int selectedExtra: 5;
+					width: 2;
+					implicitHeight: index % 5 == 0 ? 8: 5;
+					height: (Math.round(lines.steps*slider.position) == index ? implicitHeight + selectedExtra : implicitHeight) + extra;
+					color: Math.round(lines.steps*slider.position) >= index ? root.barColor : root.overShootColor;
+					LineBehavior on color{}
+					LineBehavior on height{}
+					x: (parent.width - slider.handle.width) / lines.steps * index + slider.handle.width/2;
+				}
+			}
+		}
+	}
     Text {
         visible: root.textLeft != "";
-        anchors.bottom: parent.bottom;
+        anchors.top: sliderContainer.bottom;
         //y: slider.y + slider.height + 20;
         color: root.textColor;
         font.family: root.font;
@@ -150,7 +162,7 @@ Rectangle{
     Text {
         visible: root.textRight != "";
         anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
+        anchors.top: sliderContainer.bottom;
         //y: slider.y + slider.height + 20;
         color: root.textColor;
         font.family: root.font;

@@ -44,8 +44,8 @@ Rectangle{
 	component SoundTile: Rectangle{
 		id: item
 		width: frame.width;
+		height: childrenRect.height;
 		required property PwNodeAudio audioNode;
-		height: 100;
 		clip: true;
 		required property string nodeName;
 		required property string nodeTitle;
@@ -71,120 +71,145 @@ Rectangle{
 		Rectangle{
 			property int padding: 5;
 			width: parent.width - padding*2;
-			height: parent.height - padding*2;
+			height: childrenRect.height;
 			x: padding;
 			y: padding;
 			color: Components.Colour.trans;
-			Components.SquaredIcon{
-				id: icon;
-				icon: item.icon;
-				height: 32;
-			}
-			Text {
-				anchors.top: parent.top;
-				width: parent.width - icon.width;
-				anchors.left: icon.right;
-				anchors.bottom: slider.top;
-				//verticalAlignment: Text.AlignVCenter;
-				color: item.activeTextColor;
-				font.family: item.fontFamily;
-				font.pointSize: 12;
-				wrapMode: Text.WordWrap;
-				text: item.nodeTitle;
-			}
-			Components.Slider{
-				id: slider;
-				textColor: item.activeTextColor;
-				barColor: item.activeColor;
+			
+			ColumnLayout{
+				spacing: 0;
 				width: parent.width;
-				anchors.verticalCenter: parent.verticalCenter;
-				anchors.horizontalCenter: parent.horizontalCenter;
-				backgroundColor: item.activeBackgroundColor;
-				emptyColor: item.activeSliderColor;
-				overShootColor: item.activeSecondaryColor;
-				overShootLocation: 1.0;
-				stepSize: 0.05;
-				value: item.audioNode.volume;
-				from: 0;
-				to: 1.5;
-				textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
-				textRight: "";
-				textPressed: `${Math.round(value * 1000)/10}%`;
-				font: "Iosevka";
-				textSizeBottom: 12;
-				textSizePressed: 10;
-				onMoved: {
-					item.audioNode.volume = value;
-				}
-			}
-			Rectangle{
-				height: 28;
-				width: 40;
-				color: item.audioNode != null ? (item.audioNode.muted ? item.activeColor : item.activeBackgroundColor) : item.activeBackgroundColor;
-				border.width: 1;
-				border.color: item.activeColor;
-				radius: 3;
-				anchors.bottom: parent.bottom;
-				anchors.right: parent.right;
-				Behavior on color{
-					ColorAnimation {
-						duration: 100;
+				//text section
+				Item{
+					Layout.fillWidth: true;
+					implicitHeight: childrenRect.height;
+					Components.SquaredIcon{
+						anchors.left: parent.left;
+						id: icon;
+						icon: item.icon;
+						height: 32;
+					}
+					Text {
+						id: cardName;
+						anchors.right: parent.right;
+						width: parent.width - icon.width;
+						color: item.activeTextColor;
+						font.family: item.fontFamily;
+						font.pointSize: 12;
+						wrapMode: Text.WordWrap;
+						text: item.nodeTitle;
 					}
 				}
-				MouseArea{
-					anchors.fill: parent;
-					hoverEnabled: true;
-					onClicked: {
-						item.audioNode.muted = !item.audioNode.muted;
+				// main slidder section
+				Item{
+					Layout.fillWidth: true;
+					height: childrenRect.height;
+					Components.Slider{
+						id: slider;
+						textColor: item.activeTextColor;
+						barColor: item.activeColor;
+						width: parent.width;
+						anchors.top: parent.top;
+						anchors.horizontalCenter: parent.horizontalCenter;
+						backgroundColor: item.activeBackgroundColor;
+						emptyColor: item.activeSliderColor;
+						overShootColor: item.activeSecondaryColor;
+						overShootLocation: 1.0;
+						stepSize: 0.05;
+						value: item.audioNode.volume;
+						from: 0;
+						to: 1.5;
+						textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
+						textRight: "";
+						textPressed: `${Math.round(value * 1000)/10}%`;
+						font: "Iosevka";
+						textSizeBottom: 12;
+						textSizePressed: 10;
+						onMoved: {
+							item.audioNode.volume = value;
+						}
 					}
-				}
-				Components.SquaredIcon{
-					anchors.centerIn: parent;
-					icon: Components.Icons.volume_mute;
-					height: 20;
-					iconColor: item.audioNode.muted ? item.activeSliderColor : item.activeTextColor;
-					Behavior on iconColor{
-						ColorAnimation {
-							duration: 100;
+					Rectangle{
+						height: 28;
+						width: 40;
+						color: item.audioNode != null ? (item.audioNode.muted ? item.activeColor : item.activeBackgroundColor) : item.activeBackgroundColor;
+						border.width: 1;
+						border.color: item.activeColor;
+						radius: 3;
+						anchors.top: slider.bottom;
+						anchors.right: parent.right;
+						Behavior on color{
+							ColorAnimation {
+								duration: 100;
+							}
+						}
+						MouseArea{
+							anchors.fill: parent;
+							hoverEnabled: true;
+							onClicked: {
+								item.audioNode.muted = !item.audioNode.muted;
+							}
+						}
+						Components.SquaredIcon{
+							anchors.centerIn: parent;
+							icon: Components.Icons.volume_mute;
+							height: 20;
+							iconColor: item.audioNode.muted ? item.activeSliderColor : item.activeTextColor;
+							Behavior on iconColor{
+								ColorAnimation {
+									duration: 100;
+								}
+							}
 						}
 					}
 				}
-			}
-			ColumnLayout{
-				width: parent.width;
+				//balance section
 				Repeater{
 					model: item.audioNode.channels.length;
-					delegate: Rectangle{
-						color: "transparent";
-						width: parent.width;
-						height: childrenRect.height;
+					delegate: RowLayout{
+						id: channelRoot;
+						Layout.preferredHeight: childrenRect.height + 10;
+						layoutDirection: Qt.LeftToRight;
+						Layout.fillWidth: true;
 						required property int index;
-						Text{
-							text: `${parent.index} ${Math.floor(100*item.audioNode.volumes[parent.index])} ${item.audioNode.channels[parent.index]}`;
-							color: "white";
+						Item{
+							Layout.preferredWidth: 40;
+							height: childrenRect.height;
+							Column{
+								Text{
+									text: `${PwAudioChannel.toString(item.audioNode.channels[channelRoot.index])}`;
+									font.family: "Iosevka";
+									color: item.activeTextColor;
+								}
+								Text{
+									text: `${Math.round(item.audioNode.volumes[channelRoot.index] * 1000)/10}%`;
+									font.family: "Iosevka";
+									color: item.activeTextColor;
+								}
+							}
 						}
 						Components.Slider{
+							id:thithithi;
 							textColor: item.activeTextColor;
 							barColor: item.activeColor;
-							width: parent.width;
-							anchors.verticalCenter: parent.verticalCenter;
-							anchors.horizontalCenter: parent.horizontalCenter;
+							Layout.fillWidth: true;
+							Layout.alignment: Qt.AlignBottom;
 							backgroundColor: item.activeBackgroundColor;
 							emptyColor: item.activeSliderColor;
 							overShootColor: item.activeSecondaryColor;
 							overShootLocation: 1.0;
 							stepSize: 0.05;
-							value: item.audioNode.volumes[parent.index];
+							value: item.audioNode.volumes[channelRoot.index];
 							from: 0;
 							to: 1.5;
-							textLeft: `${Math.round(item.audioNode.volume * 1000)/10}%`;
+							textLeft: "";
 							textRight: "";
 							textPressed: `${Math.round(value * 1000)/10}%`;
 							font: "Iosevka";
 							textSizeBottom: 12;
 							textSizePressed: 10;
 							onMoved: {
-								item.audioNode.volumes[parent.index] = value;
+								item.audioNode.volumes[channelRoot.index] = value;
 							}
 						}
 					}
@@ -277,7 +302,6 @@ Rectangle{
                     nodeId: id;
                     nodeTitle: description;
                     isDevice: true;
-                    height: 180;
                     clip: true;
                     icon: root.getIcon(description);
                     activeColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active : Components.Colour.accent) : "white";
