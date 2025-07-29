@@ -8,14 +8,12 @@ import QtQml.Models
 import "../Components/" as Components
 import Quickshell.Services.Pipewire
 
-Rectangle{
+Item{
 	id: root;
-	color: Components.Colour.trans;
 	width: 300;
 	property real manualGap: 8;
 	height: frame.height + manualGap * 2;
 	property real maxHeight: 800;
-	property PwObjectTracker tracker: Components.GlobalState.tracker;
 	//can set default icons for specific audio outputs
 	property var iconMap: {
 		"M Series Headphone + Monitor Out": Components.Icons.headphones,
@@ -30,7 +28,15 @@ Rectangle{
 		}
 		return icon;
 	}
-	clip: false
+    readonly property PwObjectTracker outputTracker: PwObjectTracker{
+        objects: Components.GlobalState.outputNodes;
+    }
+    readonly property PwObjectTracker inputTracker: PwObjectTracker{
+        objects: Components.GlobalState.inputNodes;
+    }
+    readonly property PwObjectTracker applicationTracker: PwObjectTracker{
+        objects: Components.GlobalState.applicationOutputNodes;
+    }
 	MouseArea{
 		width: root.width;
 		height: root.height;
@@ -45,11 +51,12 @@ Rectangle{
 		id: item
 		width: frame.width;
 		height: childrenRect.height;
-		required property PwNodeAudio audioNode;
 		clip: true;
-		required property string nodeName;
-		required property string nodeTitle;
-		required property string nodeId;
+		required property PwNode node;
+		property PwNodeAudio audioNode: node.audio;
+		property string nodeName: node.name;
+		property string nodeTitle: node.description;
+		property string nodeId: node.id;
 		required property var activeColor;
 		required property var activeSecondaryColor;
 		required property var activeSliderColor;
@@ -64,7 +71,7 @@ Rectangle{
 			anchors.fill: item;
 			onClicked:{
 				if(item.isDevice){
-					Components.GlobalState.setNodeDefault(item.nodeName, item.nodeId);
+					Pipewire.preferredDefaultAudioSink = item.node;
 				}
 			}
 		}
@@ -189,7 +196,6 @@ Rectangle{
 							}
 						}
 						Components.Slider{
-							id:thithithi;
 							textColor: item.activeTextColor;
 							barColor: item.activeColor;
 							Layout.fillWidth: true;
@@ -227,137 +233,40 @@ Rectangle{
         //anchors.fill: parent;
         height: Math.min(column.height, root.maxHeight);
         //Applications
-        DelegateModel{
-            id: streamModel;
-            model: Pipewire.nodes.values;
-            groups: [
-                DelegateModelGroup {
-                    includeByDefault: false;
-                    name: "outputDevice" }
-            ]
-            filterOnGroup: "outputDevice";
-            delegate: Rectangle{
-                width: childrenRect.width;
-                height: childrenRect.height;
-                color: Components.Colour.trans;
-
-                SoundTile{
-                    width: frame.width;
-                    audioNode: audio;
-                    nodeName: name;
-                    nodeId: id;
-                    nodeTitle: nodeName;
-                    height: 180;
-                    clip: true;
-                    activeColor: Components.Colour.accent;
-                    activeSecondaryColor: Components.Colour._active2;
-                    activeSliderColor: Components.Colour.accent_dark;
-                    activeTextColor: Components.Colour.fg;
-                    activeBackgroundColor: Components.Colour.bg;
-                    fontFamily: "Iosevka";
-                    border.color: activeColor;
-                    border.width: 2;
-                    color: Components.Colour.trans;
-                    radius: 2;
-                }
-            }
-            items.onChanged: {
-                filter();
-            }
-            Component.onCompleted:{
-                filter();
-            }
-
-            function filter(){
-                for( var i = 0; i < items.count;i++ ) {  
-                    var entry = items.get(i);  
-                    if(!entry.model.isSink && entry.model.audio && entry.model.isStream && entry.model.audio != null) {  
-                        entry.inOutputDevice = true;
-                    }  
-                }
-            }
-        }
         //Devices
-        DelegateModel{
-            id: sinkModel;
-            model: Pipewire.nodes.values;
-            groups: [
-                DelegateModelGroup {
-                    id: outputItems;
-                    includeByDefault: false;
-                    name: "outputDevice" ;
-                }
-            ]
-
-            filterOnGroup: "outputDevice";
-            delegate: Rectangle{
-                width: childrenRect.width;
-                height: childrenRect.height;
-                color: Components.Colour.trans;
-
-                SoundTile{
-                    width: frame.width;
-                    audioNode: audio;
-                    nodeName: name;
-                    nodeId: id;
-                    nodeTitle: description;
-                    isDevice: true;
-                    clip: true;
-                    icon: root.getIcon(description);
-                    activeColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active : Components.Colour.accent) : "white";
-                    activeSecondaryColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour._active3 : Components.Colour._active2) : "white";
-                    activeSliderColor: Components.GlobalState.defaultAudio != null ? (Components.GlobalState.defaultAudio.id == nodeId ? Components.Colour.selectedDark : Components.Colour.accent_dark) : "white";
-                    activeTextColor: Components.Colour.fg;
-                    activeBackgroundColor: Components.Colour.bg;
-                    fontFamily: "Iosevka";
-                    border.color: activeColor;
-                    border.width: 2;
-                    color: Components.Colour.trans;
-                    radius: 2;
-                }
-            }
-            items.onChanged: {
-                filter();
-            }
-            Component.onCompleted:{
-                filter();
-            }
-            property var lessThan: function(left, right) { return left < right; }
-            function filter(){
-                /*
-                if(items.count > 0){
-                    items.setGroups(0, items.count, "items");
-                }
-                */
-                var list = [];
-                for( var i = 0; i < items.count;i++ ) {  
-                    var entry = items.get(i);  
-                    if(entry.model.isSink && !entry.model.isStream) {  
-                        list.push(entry);
-                    }  
-                }
-                // Step 2: Sort the list of visible items
-                list.sort(function(a, b) {
-                    return lessThan(a.model.description, b.model.description) ? -1 : 1;
-                });
-
-                for(var i = 0; i < list.length; ++i) {
-                    entry = list[i];
-                    entry.inOutputDevice = true;
-                    if (entry.outputDeviceIndex !== i) {
-                        outputItems.move(entry.outputDeviceIndex, i, 1);
-                    }
-                }
-
-            }
-        }
 
         ColumnLayout{
             id: column;
             spacing: 5;
             height: Math.min(implicitHeight, root.maxHeight);
             Repeater{
-                model: sinkModel;
+                model: ScriptModel{ 
+                    values: Components.GlobalState.outputNodes;
+                }
+                delegate: Rectangle{
+                    required property var modelData;
+                    width: childrenRect.width;
+                    height: childrenRect.height;
+                    color: Components.Colour.trans;
+                    SoundTile{
+                        width: frame.width;
+                        node: parent.modelData;
+                        height: 180;
+                        clip: true;
+                        isDevice: true;
+                        icon: root.getIcon(node.description);
+                        activeColor: Components.GlobalState.defaultAudio == node ? Components.Colour._active : Components.Colour.accent;
+                        activeSecondaryColor: Components.GlobalState.defaultAudio == node ? Components.Colour._active3 : Components.Colour._active2;
+                        activeSliderColor: Components.GlobalState.defaultAudio == node ? Components.Colour.selectedDark : Components.Colour.accent_dark;
+                        activeTextColor: Components.Colour.fg;
+                        activeBackgroundColor: Components.Colour.bg;
+                        fontFamily: "Iosevka";
+                        border.color: activeColor;
+                        border.width: 2;
+                        color: Components.Colour.trans;
+                        radius: 2;
+                    }
+                }
             }
             Rectangle{
                 id: splitter;
@@ -384,7 +293,30 @@ Rectangle{
                     id: list
                     height: childrenRect.height; 
                     spacing: 5;
-                    model: streamModel;
+                    model: ScriptModel{
+                        values: Components.GlobalState.applicationOutputNodes;
+                    }
+                    delegate: Rectangle{
+                        required property var modelData;
+                        width: childrenRect.width;
+                        height: childrenRect.height;
+                        color: Components.Colour.trans;
+                        SoundTile{
+                            width: frame.width;
+                            node: parent.modelData;
+                            clip: true;
+                            fontFamily: "Iosevka";
+                            activeColor: Components.Colour.accent;
+                            activeSecondaryColor: Components.Colour._active2;
+                            activeSliderColor: Components.Colour.accent_dark;
+                            activeTextColor: Components.Colour.fg;
+                            activeBackgroundColor: Components.Colour.bg;
+                            border.color: activeColor;
+                            border.width: 2;
+                            color: Components.Colour.trans;
+                            radius: 2;
+                        }
+                    }
                 }
             }
         }
