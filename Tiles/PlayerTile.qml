@@ -26,7 +26,7 @@ Rectangle{
     required property var model;
     property real padding: 0;
     color: Components.Colour.trans;
-    height: container.height + padding*2;
+    height: container.height + controls.height - 10;
     required property string backgroundColor;
     required property string activeColor;
     required property string textColor;
@@ -38,10 +38,10 @@ Rectangle{
     Rectangle{
         id: container;
         width: player.width - player.padding*2;
-        height: childrenRect.height; 
-        anchors.centerIn: parent;
+        height: childrenRect.height - 5; 
         color: Components.Colour.trans;
         Column{
+            id: playerInfoColumn;
             width: parent.width;
             height: childrenRect.height;
             Rectangle{
@@ -89,8 +89,8 @@ Rectangle{
                     radius: 3;
                 }
             }
+            //slider stuff
             ColumnLayout{
-                id: playerControls;
                 width: parent.width;
                 spacing: 0;
                 Text{
@@ -107,59 +107,62 @@ Rectangle{
                     text: player.model.trackArtist || "Unknown Artist"
                     font.pointSize: 10;
                 }
-                Rectangle{
-                    width: parent.width;
-                    color: player.backgroundColor;
-                    height: 40;
-                    Components.Slider{
-                        anchors.bottom: parent.bottom;
-                        id: progressBar;
-                        textColor: player.textColor;
-                        barColor: player.boxColor;
-                        width: parent.width;
-                        backgroundColor: player.backgroundColor;
-                        emptyColor: player.emptyBarColor;
-                        overShootColor: player.emptyBarColor;
-                        overShootLocation: 1.0;
-                        stepSize: 1;
-                        from: 0;
-                        height: 58;
-                        disableBars: true;
-                        value: player.model.position;
-                        to: player.model.length;
-                        textLeft: player.formatTime(player.model.position);
-                        textRight: player.formatTime(player.model.length);
-                        textPressed: player.formatTime(value);
-                        font: "Iosevka";
-                        textSizeBottom: 12;
-                        textSizePressed: 10;
-                        onMoved: {
-                            if(!player.model.canSeek){
-                                console.log("CANT SEEK");
-                                value = player.model.position;
-                                return;
-                            }
-                            player.model.position = value;
+                Components.Slider{
+                    id: progressBar;
+                    Layout.fillWidth: true;
+                    textColor: player.textColor;
+                    barColor: player.boxColor;
+                    backgroundColor: player.backgroundColor;
+                    emptyColor: player.emptyBarColor;
+                    overShootColor: player.emptyBarColor;
+                    overShootLocation: 1.0;
+                    stepSize: Math.round(to/50);
+                    from: 0;
+                    disableBars: false;
+                    value: player.model.position;
+                    to: player.model.length;
+                    textLeft: player.formatTime(player.model.position);
+                    textRight: player.formatTime(player.model.length);
+                    textPressed: player.formatTime(value);
+                    font: "Iosevka";
+                    textSizeBottom: 12;
+                    textSizePressed: 10;
+                    onMoved: {
+                        if(!player.model.canSeek){
+                            console.log("CANT SEEK");
+                            value = player.model.position;
+                            return;
                         }
-                        //
-                        Process{
-                            id: mpdSeekProc;
-                            property string seekPos: "00:00:00";
-                            property string playerLocation: "";
-                            running: false;
-                            command: ["mpc", "-h", playerLocation, "seek", seekPos];
-                            stderr: SplitParser{
-                                onRead: (value) => console.log(value);
-                            }
-                            stdout: SplitParser{
-                                onRead: (value) => console.log(value);
-                            }
+                        player.model.position = value;
+                    }
+                    Process{
+                        id: mpdSeekProc;
+                        property string seekPos: "00:00:00";
+                        property string playerLocation: "";
+                        running: false;
+                        command: ["mpc", "-h", playerLocation, "seek", seekPos];
+                        stderr: SplitParser{
+                            onRead: (value) => console.log(value);
+                        }
+                        stdout: SplitParser{
+                            onRead: (value) => console.log(value);
                         }
                     }
                 }
+                //spacer cause fuck it
+                Item{
+                    width: parent.width;
+                    height: 25;
+                }
             }
+            //bottom strip
+        }
+    }
             Components.CenterButtonStripLayout{
-                height: 50;
+                id: controls;
+                anchors.top: container.bottom;
+                height: 40;
+                width: parent.width;
                 color: Components.Colour.accent;
                 borderColor: Components.Colour.bg_solid;
                 fillColor: Components.Colour._active;
@@ -199,6 +202,7 @@ Rectangle{
                                     }
                                 }
                             }
+                            iconColor: Components.Colour.fg;
                         }
                             function nextRepeat(){
                                 if(player.model.loopState == MprisLoopState.None){
@@ -226,6 +230,7 @@ Rectangle{
                             anchors.centerIn: parent;
                             id: prevButton;
                             icon: Components.Icons.prev;
+                            iconColor: Components.Colour.fg;
                         }
                         signal clicked();
                         onClicked: {
@@ -242,6 +247,7 @@ Rectangle{
                             anchors.centerIn: parent;
                             id: playButton;
                             icon: player.model.isPlaying ? Components.Icons.pause : Components.Icons.play;
+                            iconColor: Components.Colour.fg;
                         }
                         signal clicked();
                         onClicked: {
@@ -258,6 +264,7 @@ Rectangle{
                             anchors.centerIn: parent;
                             id: nextButton;
                             icon: Components.Icons.next;
+                            iconColor: Components.Colour.fg;
                         }
                         signal clicked();
                         onClicked: {
@@ -289,6 +296,7 @@ Rectangle{
                                     }
                                 }
                             }
+                            iconColor: Components.Colour.fg;
                         }
                         signal clicked();
                         onClicked:{
@@ -298,8 +306,6 @@ Rectangle{
                 ]
 
             }
-        }
-    }
 
     Timer{
         running: player.visible;

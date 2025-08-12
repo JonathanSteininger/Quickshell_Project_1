@@ -24,7 +24,6 @@ Rectangle{
     color: Components.Colour.trans;
     Column{
         id: container;
-        y: 5;
         width: parent.width -10;
         anchors.horizontalCenter: parent.horizontalCenter;
         spacing: 10;
