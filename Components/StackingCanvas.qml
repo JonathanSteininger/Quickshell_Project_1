@@ -85,10 +85,12 @@ Shape{
         anchors.fill: parent;
         clip: true;
         color: "#00000000";
+        /*
         layer.enabled: true;
         layer.effect: OpacityMask{
             maskSource: clippingMask2;
         }
+        */
         Item{
             x: root.padding;
             y: root.padding;
@@ -201,6 +203,7 @@ Shape{
             }
         }
     }
+    /*
     Shape{
         id:clippingMask2;
         visible:false;
@@ -226,4 +229,5 @@ Shape{
             PathLine { x: clippingMask2.cornerSize; y: 0; }
         }
     }
+    */
 }
