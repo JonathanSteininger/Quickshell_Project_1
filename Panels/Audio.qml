@@ -4,8 +4,9 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell.Widgets
 import QtQml
+import QtQuick.Shapes
 import QtQml.Models
-import "../Components/" as Components
+import qs.Components as Components
 import Quickshell.Services.Pipewire
 
 Item{
@@ -50,9 +51,10 @@ Item{
 	component SoundTile: Rectangle{
 		id: item
 		width: frame.width;
-		height: childrenRect.height;
+		implicitHeight: itemChild.height;
 		clip: true;
 		required property PwNode node;
+        property bool channelsOpen: false;
 		property PwNodeAudio audioNode: node.audio;
 		property string nodeName: node.name;
 		property string nodeTitle: node.description;
@@ -76,12 +78,20 @@ Item{
 			}
 		}
 		Rectangle{
+            id: itemChild;
 			property int padding: 5;
 			width: parent.width - padding*2;
-			height: childrenRect.height;
+            height: childrenRect.height - ( item.channelsOpen ? 0 : channelsbox.height) + padding*2;
+            Behavior on height{
+                PropertyAnimation{
+                    duration: 200;
+                    easing.type: Easing.InOutQuad;
+                }
+            }
 			x: padding;
 			y: padding;
 			color: Components.Colour.trans;
+            clip: true;
 			
 			ColumnLayout{
 				spacing: 0;
@@ -94,6 +104,7 @@ Item{
 						anchors.left: parent.left;
 						id: icon;
 						icon: item.icon;
+                        iconColor: item.activeTextColor;
 						height: 32;
 					}
 					Text {
@@ -169,66 +180,120 @@ Item{
 							}
 						}
 					}
+					Row{
+                        id: channelButton
+                        height: 28;
+						anchors.top: slider.bottom;
+						anchors.horizontalCenter: parent.horizontalCenter;
+						Components.SquaredIcon{
+                            anchors.verticalCenter: parent.verticalCenter;
+                            id: channelicon;
+                            height: 50;
+							icon: Components.Icons.audio_channel_filled;
+							iconColor: item.activeTextColor;
+						}
+                        Shape{
+                            id: iconShape;
+                            anchors.verticalCenter: parent.verticalCenter;
+                            height: 6;
+                            width: height*2;
+                            property real heightChange: item.channelsOpen ? height : 0;
+                            Behavior on heightChange{
+                                PropertyAnimation{
+                                    duration: 200;
+                                    easing.type: Easing.InOutQuad;
+                                }
+                            }
+                            ShapePath{
+                                strokeColor: item.activeTextColor;
+                                strokeWidth: 2;
+                                fillColor: Components.Colour.trans;
+                                capStyle: ShapePath.RoundCap;
+
+                                startX: 0;
+                                startY: iconShape.height - iconShape.heightChange;
+                                PathLine{
+                                    x: iconShape.width/2;
+                                    y: iconShape.heightChange;
+                                }
+                                PathLine{
+                                    x: iconShape.width;
+                                    y: iconShape.height - iconShape.heightChange;
+                                }
+                            }
+                        }
+					}
+                    MouseArea{
+                        anchors.fill: channelButton;
+                        hoverEnabled: true;
+                        onClicked: {
+                            item.channelsOpen = !item.channelsOpen;
+                        }
+                    }
 				}
 				//balance section
-				Repeater{
-					model: item.audioNode.channels.length;
-					delegate: RowLayout{
-						id: channelRoot;
-						Layout.preferredHeight: childrenRect.height + 10;
-						layoutDirection: Qt.LeftToRight;
-						Layout.fillWidth: true;
-						required property int index;
-						Item{
-							Layout.preferredWidth: 40;
-							height: childrenRect.height;
-							Column{
-								Text{
-									text: `${PwAudioChannel.toString(item.audioNode.channels[channelRoot.index])}`;
-									font.family: "Iosevka";
-									color: item.activeTextColor;
-								}
-								Text{
-									text: `${Math.round(item.audioNode.volumes[channelRoot.index] * 1000)/10}%`;
-									font.family: "Iosevka";
-									color: item.activeTextColor;
-								}
-							}
-						}
-						Components.Slider{
-							textColor: item.activeTextColor;
-							barColor: item.activeColor;
-							Layout.fillWidth: true;
-							Layout.alignment: Qt.AlignBottom;
-							backgroundColor: item.activeBackgroundColor;
-							emptyColor: item.activeSliderColor;
-							overShootColor: item.activeSecondaryColor;
-							overShootLocation: 1.0;
-							stepSize: 0.05;
-							value: item.audioNode.volumes[channelRoot.index];
-							from: 0;
-							to: 1.5;
-							textLeft: "";
-							textRight: "";
-							textPressed: `${Math.round(value * 1000)/10}%`;
-							font: "Iosevka";
-							textSizeBottom: 12;
-							textSizePressed: 10;
-							onMoved: {
-								item.audioNode.volumes[channelRoot.index] = value;
-							}
-						}
-					}
-				}
+                ColumnLayout{
+                    id: channelsbox;
+                    Layout.fillWidth: true;
+                    Repeater{
+                        model: item.audioNode.channels.length;
+                        delegate: RowLayout{
+                            id: channelRoot;
+                            Layout.preferredHeight: childrenRect.height + 10;
+                            layoutDirection: Qt.LeftToRight;
+                            Layout.fillWidth: true;
+                            required property int index;
+                            Item{
+                                Layout.preferredWidth: 40;
+                                height: childrenRect.height;
+                                Column{
+                                    Text{
+                                        text: `${PwAudioChannel.toString(item.audioNode.channels[channelRoot.index])}`;
+                                        font.family: "Iosevka";
+                                        color: item.activeTextColor;
+                                    }
+                                    Text{
+                                        text: `${Math.round(item.audioNode.volumes[channelRoot.index] * 1000)/10}%`;
+                                        font.family: "Iosevka";
+                                        color: item.activeTextColor;
+                                    }
+                                }
+                            }
+                            Components.Slider{
+                                textColor: item.activeTextColor;
+                                barColor: item.activeColor;
+                                Layout.fillWidth: true;
+                                Layout.alignment: Qt.AlignBottom;
+                                backgroundColor: item.activeBackgroundColor;
+                                emptyColor: item.activeSliderColor;
+                                overShootColor: item.activeSecondaryColor;
+                                overShootLocation: 1.0;
+                                stepSize: 0.05;
+                                value: item.audioNode.volumes[channelRoot.index];
+                                from: 0;
+                                to: 1.5;
+                                textLeft: "";
+                                textRight: "";
+                                textPressed: `${Math.round(value * 1000)/10}%`;
+                                font: "Iosevka";
+                                textSizeBottom: 12;
+                                textSizePressed: 10;
+                                onMoved: {
+                                    item.audioNode.volumes[channelRoot.index] = value;
+                                }
+                            }
+                        }
+                    }
+                }
 			}
 		}
 	}
-    Rectangle{
+    // visible parts
+    Item{
         id: frame;
         x: root.manualGap;
         y: root.manualGap;
         clip: true;
-        color: Components.Colour.trans;
         width: root.width - root.manualGap*2;
         //anchors.fill: parent;
         height: Math.min(column.height, root.maxHeight);
@@ -238,20 +303,18 @@ Item{
         ColumnLayout{
             id: column;
             spacing: 5;
-            height: Math.min(implicitHeight, root.maxHeight);
             Repeater{
                 model: ScriptModel{ 
                     values: Components.GlobalState.outputNodes;
                 }
-                delegate: Rectangle{
+                delegate: Item{
                     required property var modelData;
                     width: childrenRect.width;
-                    height: childrenRect.height;
-                    color: Components.Colour.trans;
+                    implicitHeight: thingChild.implicitHeight;
                     SoundTile{
+                        id: thingChild;
                         width: frame.width;
                         node: parent.modelData;
-                        height: 180;
                         clip: true;
                         isDevice: true;
                         icon: root.getIcon(node.description);
@@ -296,14 +359,14 @@ Item{
                     model: ScriptModel{
                         values: Components.GlobalState.applicationOutputNodes;
                     }
-                    delegate: Rectangle{
+                    delegate: Item{
                         required property var modelData;
-                        width: childrenRect.width;
-                        height: childrenRect.height;
-                        color: Components.Colour.trans;
+                        implicitWidth: childrenRect.width;
+                        implicitHeight: childrenRect.height;
                         SoundTile{
                             width: frame.width;
                             node: parent.modelData;
+                            nodeTitle: parent.modelData.name;
                             clip: true;
                             fontFamily: "Iosevka";
                             activeColor: Components.Colour.accent;

@@ -5,7 +5,7 @@ import Quickshell.Services.SystemTray
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import "../Components/"
 
 ButtonStrip{
@@ -26,18 +26,22 @@ ButtonStrip{
         SquaredIcon{
             icon: Icons.brightness;
             onClicked: GlobalState.popupRight("brightness", rightPanel.convertPopoutPosition(x, width));
+            iconColor: Colour.fg;
         },
         SquaredIcon{
             icon: Icons.network_up;
             onClicked: console.log("brightness");
+            iconColor: Colour.fg;
         },
         SquaredIcon{
             icon: Icons.network_down;
             onClicked: console.log("brightness");
+            iconColor: Colour.fg;
         },
         SquaredIcon{
             icon: Icons.temp;
             onClicked: console.log("brightness");
+            iconColor: Colour.fg;
         },
         Repeater{
             model: SystemTray.items;
@@ -49,8 +53,10 @@ ButtonStrip{
                 Image{
                     id: image;
                     source:modelData.icon;
+                    sourceSize: Qt.size(width*8,height*8)
                     width: 30;
                     height: 30;
+                    visible: false;
                 }
                 color: Colour.trans;
                 signal clicked();
@@ -64,11 +70,11 @@ ButtonStrip{
                     GlobalState.activeSysTrayMenu = modelData.menu;
                     GlobalState.popupRight("tray_menu", rightPanel.convertPopoutPosition(x,width));
                 }
-                ColorOverlay{
-                    visible: false
+                MultiEffect{
                     anchors.fill: image;
                     source: image;
-                    color: Colour.fg;
+                    colorizationColor: Colour.fg;
+                    colorization: 1.0;
                 }
             }
         },
@@ -96,6 +102,7 @@ ButtonStrip{
             SquaredIcon{
                 icon: getIcon();
                 height: 24;
+                iconColor: Colour.fg;
                 function getIcon(){
                     if(GlobalState.defaultAudio == null){
                         return Icons.volume_mute

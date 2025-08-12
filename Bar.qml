@@ -53,7 +53,6 @@ Scope {
             Components.GlobalState.leftPos.y = y;
         }
         anchor.rect.y: -6;
-        Panels.Audio {}
         Panels.Time {}
     }
 

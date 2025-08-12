@@ -23,7 +23,6 @@ Singleton {
     property point leftPos: Qt.point(0, -80);
 
     property list<string> leftMap:[
-        "audio",
         "time"
     ]
 
@@ -75,11 +74,11 @@ Singleton {
     //tracks default audio.
     readonly property PwNode defaultAudio: Pipewire.defaultAudioSink;
     readonly property PwNode defaultAudioSource: Pipewire.defaultAudioSource;
-    readonly property list<PwNode> outputNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isAudio(node.type) && isSink(node.type));
-    readonly property list<PwNode> inputNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isAudio(node.type) && isSource(node.type));
-    readonly property list<PwNode> applicationOutputNodes: Pipewire.nodes.values.filter((node) => isStream(node.type) && isAudio(node.type) && isSink(node.type));
-    readonly property list<PwNode> applicationInputNodes: Pipewire.nodes.values.filter((node) => isStream(node.type) && isAudio(node.type) && isSource(node.type));
-    readonly property list<PwNode> videoNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isVideo(node.type) && isSource(node.type));
+    readonly property var outputNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isAudio(node.type) && isSink(node.type));
+    readonly property var inputNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isAudio(node.type) && isSource(node.type));
+    readonly property var applicationOutputNodes: Pipewire.nodes.values.filter((node) => isStream(node.type) && isAudio(node.type) && isSink(node.type));
+    readonly property var applicationInputNodes: Pipewire.nodes.values.filter((node) => isStream(node.type) && isAudio(node.type) && isSource(node.type));
+    readonly property var videoNodes: Pipewire.nodes.values.filter((node) => !isStream(node.type) && isVideo(node.type) && isSource(node.type));
 
     readonly property PwObjectTracker defaultAudioTracker: PwObjectTracker{
         objects: [root.defaultAudio, root.defaultAudioSource];
@@ -143,14 +142,9 @@ Singleton {
         activePlayer--;
     }
 
-
-
-
     property SystemClock clock: SystemClock{ 
         precision: SystemClock.Seconds;
     }
-
-
 
 
     //workaround for brightness controls. 

@@ -50,4 +50,7 @@ Singleton{
 
     readonly property string microphone: `${iconPathLocal}microphone.svg`;
     readonly property string microphone_mute: `${iconPathLocal}microphone-slash.svg`;
+
+    readonly property string audio_channel_filled: `${iconPathLocal}channel-filled.svg`;
+    readonly property string audio_channel_outlined: `${iconPathLocal}channel-outline.svg`;
 }
