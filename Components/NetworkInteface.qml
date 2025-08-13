@@ -168,7 +168,7 @@ QtObject{
                 recivedBytesWatcher.reload();
                 root.totalRecived = recivedBytesWatcher.text().trim();
             }
-            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/rx_bytes)-${root.totalPreviousRecived})/1024"`];
+            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/rx_bytes)-${root.totalPreviousRecived})/1024/${root.updateRate/1000}"`];
             stdout: SplitParser{ 
                 onRead: (data) => {
                     root.kiloBytesRecived = parseInt(data);
@@ -188,10 +188,10 @@ QtObject{
                 if(root.totalTransmitted != "0"){
                     root.totalPreviousTransmitted = root.totalTransmitted;
                 }
-                recivedBytesWatcher.reload();
+                transmittedBytesWatcher.reload();
                 root.totalTransmitted = transmittedBytesWatcher.text().trim();
             }
-            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/tx_bytes)-${root.totalPreviousTransmitted})/1024"`];
+            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/tx_bytes)-${root.totalPreviousTransmitted})/1024/${root.updateRate/1000}"`];
             stdout: SplitParser{ 
                 onRead: (data) => {
                     root.kiloBytesTransmitted = parseInt(data);
