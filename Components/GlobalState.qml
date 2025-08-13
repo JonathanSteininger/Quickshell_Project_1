@@ -5,6 +5,8 @@ import QtQuick
 import Quickshell.Services.Pipewire
 import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
+import qs.Components as Components
+import Quickshell.Io
 
 Singleton {
     id: root;
@@ -67,6 +69,58 @@ Singleton {
         "tray_menu",
         "brightness"
     ]
+
+
+    readonly property list<QtObject> networkInterfaces: [];
+
+    Timer{
+        running: true;
+        repeat: true;
+        interval: 5000;
+        onTriggered: proccessNetworkInterfaces.running = true;
+    }
+
+    property list<string> updatedPaths;
+
+    function clearNetworkPaths(){
+        updatedPaths = updatedPaths.filter(() => false);
+    }
+
+    readonly property var netIntComponent: Qt.createComponent("NetworkInteface.qml");
+
+    function updateNetworkInterfaces(){
+        if(netIntComponent.status != Component.Ready){
+            console.log("skipping because it aint ready yet:", netIntComponent.status);
+            console.log("Null", Component.Null, "Ready", Component.Ready, "Loading", Component.Loading, "Error", Component.Error);
+            return
+        }
+        var removableInterfaces = networkInterfaces.filter((face) => !updatedPaths.some((path) => path == face.interfacePath));
+        //console.log("amount destroyed:", removableInterfaces.length);
+        removableInterfaces.forEach((removableThing) => {
+            console.log("destroying:", removableThing.interfacePath);
+            removableThing.destroy()
+        });
+        var missingPaths = updatedPaths.filter((path) => !networkInterfaces.some((face) => face.interfacePath == path));
+        //console.log("amount to create:", missingPaths.length);
+        missingPaths.forEach((path) => {
+            console.log("creating: ", path);
+            networkInterfaces.push(netIntComponent.createObject(null, {interfacePath: path}))
+        });
+    }
+
+    Process{
+        id: proccessNetworkInterfaces;
+        command: ["find", "/sys/class/net", "-maxdepth", "1", "-mindepth", "1"];
+        running: true;
+        onStarted: root.clearNetworkPaths();
+        onExited: root.updateNetworkInterfaces();
+        stdout: SplitParser{
+            onRead: (data) => {
+                root.updatedPaths.push(data);
+            }
+        }
+    }
+
 
     property var blankTrayMenu: null;
     property var activeSysTrayMenu: null;
