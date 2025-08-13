@@ -28,15 +28,55 @@ ButtonStrip{
             onClicked: GlobalState.popupRight("brightness", rightPanel.convertPopoutPosition(x, width));
             iconColor: Colour.fg;
         },
-        SquaredIcon{
-            icon: Icons.network_up;
-            onClicked: console.log("brightness");
-            iconColor: Colour.fg;
-        },
-        SquaredIcon{
-            icon: Icons.network_down;
-            onClicked: console.log("brightness");
-            iconColor: Colour.fg;
+        Item{
+            height: 45;
+            width: 75;
+            Item{
+                id: uploadBox;
+                width: uploadText.width + uploadIcon.width + 5;
+                height: childrenRect.height;
+                x: parent.width/2 + parent.height/4 - width/2;
+                anchors.top: parent.top;
+                Text{
+                    id: uploadText;
+                    anchors.left: parent.left;
+                    text: `${GlobalState.kiloBytesTransmittedTotal}kbps`;
+                    color: Colour.fg;
+                    font.family: "Iosevka";
+                    font.pointSize: 12;
+                }
+                SquaredIcon{
+                    id: uploadIcon;
+                    anchors.right: parent.right;
+                    icon: Icons.network_up;
+                    height: 20;
+                    onClicked: GlobalState.popupRight("network", rightPanel.convertPopoutPosition(x, width));
+                    iconColor: Colour.fg;
+                }
+            }
+            Item{
+                id: downloadBox;
+                width: downloadText.width + downloadIcon.width + 5;
+                height: childrenRect.height;
+                x: parent.width/2 - parent.height/4 - width/2;
+                anchors.bottom: parent.bottom;
+                Text{
+                    id: downloadText;
+                    anchors.left: parent.left;
+                    text: `${GlobalState.kiloBytesRecivedTotal}kbps`;
+                    color: Colour.fg;
+                    font.family: "Iosevka";
+                    font.pointSize: 12;
+                }
+                SquaredIcon{
+                    id: downloadIcon;
+                    icon: Icons.network_down;
+                    anchors.right: parent.right;
+                    height: 20;
+                    onClicked: console.log("brightness");
+                    iconColor: Colour.fg;
+                }
+            }
         },
         SquaredIcon{
             icon: Icons.temp;

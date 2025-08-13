@@ -58,7 +58,7 @@ Singleton {
         rightPos.y = popupOffset;
         left= -1;
         middle= -1;
-        console.log(right);
+        console.log("popoutRight:", id, right);
     }
     property int right: -1;
     property bool showRight: false;
@@ -67,11 +67,14 @@ Singleton {
     property list<string> rightMap:[
         "audio",
         "tray_menu",
-        "brightness"
+        "brightness",
+        "network"
     ]
 
 
     readonly property list<QtObject> networkInterfaces: [];
+    readonly property int kiloBytesRecivedTotal: networkInterfaces.reduce((acc, current) => acc += current.kiloBytesRecived, 0);
+    readonly property int kiloBytesTransmittedTotal: networkInterfaces.reduce((acc, current) => acc += current.kiloBytesTransmitted, 0);
 
     Timer{
         running: true;
