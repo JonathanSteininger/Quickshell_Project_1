@@ -29,8 +29,10 @@ ButtonStrip{
             iconColor: Colour.fg;
         },
         Item{
-            height: 45;
+            height: 40;
             width: 75;
+            signal clicked();
+            onClicked: GlobalState.popupRight("network", rightPanel.convertPopoutPosition(x, width));
             Item{
                 id: uploadBox;
                 width: uploadText.width + uploadIcon.width + 5;
@@ -50,7 +52,6 @@ ButtonStrip{
                     anchors.right: parent.right;
                     icon: Icons.network_up;
                     height: 20;
-                    onClicked: GlobalState.popupRight("network", rightPanel.convertPopoutPosition(x, width));
                     iconColor: Colour.fg;
                 }
             }
