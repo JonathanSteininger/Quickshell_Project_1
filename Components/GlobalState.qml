@@ -83,6 +83,11 @@ Singleton {
         onTriggered: proccessNetworkInterfaces.running = true;
     }
 
+    property real networkUpdateRate: 1000;
+    onNetworkUpdateRateChanged: {
+        networkInterfaces.forEach((netInt) => netInt.updateRate = networkUpdateRate);
+    }
+
     property list<string> updatedPaths;
 
     function clearNetworkPaths(){
@@ -109,7 +114,7 @@ Singleton {
         var missingPaths = updatedPaths.filter((path) => !networkInterfaces.some((face) => face.interfacePath == path));
         missingPaths.forEach((path) => {
             console.log("creating: ", path);
-            networkInterfaces.push(netIntComponent.createObject(null, {interfacePath: path}))
+            networkInterfaces.push(netIntComponent.createObject(null, {interfacePath: path, updateRate: networkUpdateRate}))
         });
     }
 
