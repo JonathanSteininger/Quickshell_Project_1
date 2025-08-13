@@ -103,7 +103,7 @@ Rectangle{
             usedBarColor: Components.Colour.accent;
             emptyBarColor: Components.Colour.accent_dark;
             activeColor: Components.Colour._active;
-            iconSize: 24;
+            iconSize: 20;
         }
     }
 }
