@@ -90,18 +90,20 @@ Singleton {
 
     function updateNetworkInterfaces(){
         if(netIntComponent.status != Component.Ready){
-            console.log("skipping because it aint ready yet:", netIntComponent.status);
-            console.log("Null", Component.Null, "Ready", Component.Ready, "Loading", Component.Loading, "Error", Component.Error);
+            console.error("NetworkInterface is not ready:", netIntComponent.status);
+            console.error("Null:", Component.Null, "Ready:", Component.Ready, "Loading:", Component.Loading, "Error:", Component.Error);
             return
         }
         var removableInterfaces = networkInterfaces.filter((face) => !updatedPaths.some((path) => path == face.interfacePath));
-        //console.log("amount destroyed:", removableInterfaces.length);
-        removableInterfaces.forEach((removableThing) => {
-            console.log("destroying:", removableThing.interfacePath);
-            removableThing.destroy()
-        });
+        if(removableInterfaces.length != 0){
+            //removes gonna be null values.
+            networkInterfaces = networkInterfaces.filter((face) => updatedPaths.some((path) => path == face.interfacePath));;
+            removableInterfaces.forEach((removableThing) => {
+                console.log("destroying:", removableThing.interfacePath);
+                removableThing.destroy()
+            });
+        }
         var missingPaths = updatedPaths.filter((path) => !networkInterfaces.some((face) => face.interfacePath == path));
-        //console.log("amount to create:", missingPaths.length);
         missingPaths.forEach((path) => {
             console.log("creating: ", path);
             networkInterfaces.push(netIntComponent.createObject(null, {interfacePath: path}))

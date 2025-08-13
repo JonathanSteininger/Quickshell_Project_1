@@ -16,34 +16,89 @@ QtObject{
         Ethernet,
         Bridge,
         Tunnel,
-        Wlan
+        Wlan,
+        Loopback
     }
     readonly property list<string> networkIngerfaceNameMap: [
         "Unknown",
         "Ethernet",
         "Bridge",
         "Tunnel",
-        "Wlan"
+        "Wlan",
+        "Loopback"
     ]
 
     property real updateRate: 2000;
+    property real interfaceInfoUpdateRate: 10000;
     property bool updateRunning: true;
 
     //used for everything else.
     required property string interfacePath; 
 
-    readonly property int type: NetworkInteface.NetworkIntefraceType.Unknown;
-    readonly property string name: "NULL name";
+    property int type: NetworkInteface.NetworkIntefraceType.Unknown;
+    property string name: "NULL name";
     readonly property string typeName: networkIngerfaceNameMap[type];
-    readonly property int id: -1;
+    property int id: -1;
+
+    readonly property string uevent: ueventFile.text();
+    onNameChanged: {
+        if(name == "lo"){
+            type = NetworkInteface.NetworkIntefraceType.Loopback;
+        }
+    }
+
+    //take appart the uevent info.
+    onUeventChanged: {
+        var lines = uevent.split('\n');
+        lines.forEach((line) => {
+            var splitter = line.indexOf('=');
+            var key = line.substring(0,splitter);
+            var value = line.substring(splitter+1);
+            switch(key){
+                case "DEVTYPE":
+                    break;
+                    switch (value){
+                        case "wlan":
+                            type = NetworkInteface.NetworkIntefraceType.Wlan;
+                            break;
+                        case "bridge":
+                            type = NetworkInteface.NetworkIntefraceType.Bridge;
+                            break;
+                        case "ethernet":
+                            type = NetworkInteface.NetworkIntefraceType.Ethernet;
+                            break;
+                        case "tunnel":
+                            type = NetworkInteface.NetworkIntefraceType.Tunnel;
+                            break;
+                        default:
+                            type = NetworkInteface.NetworkIntefraceType.Unknown;
+                            break;
+                    }
+                    
+                case "INTERFACE":
+                    name = value;
+                    break;
+                case "IFINDEX":
+                    id = parseInt(value);
+                    break;
+                case "":
+                    break;
+                default:
+                    console.error("unknown uevent key:", `(${key})`);
+                    break;
+            }
+        })
+    }
 
     //may be hard to get.
     readonly property string ipv4_address: "NULL 0.0.0.0";
     readonly property string ipv6_address: "NULL ::";
 
-    readonly property string mac_address: "NULL ::";
+    readonly property string mac_address: addressFile.text();
 
     readonly property bool isUp: false;
+    readonly property string status: operstateFile.text();
+    
     //maybe recived and transmitted since last update. then dont have to worry about 32bit limit
     // 32 bit limit is 2.147 billion. which translates to 2,147,000,000 bytes, or 2.147GB
     // this is bad, will prob need to cut it short, eg record kb in stead of b
@@ -60,43 +115,51 @@ QtObject{
     readonly property int kiloBitsRecived: kiloBytesRecived*8;
     readonly property int kiloBitsTransmitted: kiloBytesTransmitted*8;
 
+    function updateInterfaceInfo(){
+        operstateFile.reload();
+        addressFile.reload();
+        ueventFile.reload();
+    }
+
     readonly property list<QtObject> processes: [
+        Timer{
+            interval: root.interfaceInfoUpdateRate;
+            repeat: true;
+            running: root.updateRunning;
+            onTriggered: root.updateInterfaceInfo();
+        },
         FileView{
-            path: `${root.interfacePath}/operstate`
+            id: operstateFile;
+            path: `${root.interfacePath}/operstate`;
             watchChanges: true;
             onFileChanged: {
-                var textData = text();
-                console.log("operstate:", textData);
+                this.reload();
             }
         },
         FileView{
-            path: `${root.interfacePath}/address`
+            id: addressFile;
+            path: `${root.interfacePath}/address`;
             watchChanges: true;
-            onFileChanged: {
-                var textData = text();
-                console.log("macaddress:", textData);
-            }
+            onFileChanged: this.reload();
         },
         FileView{
-            path: `${root.interfacePath}/uevent`
+            id: ueventFile;
+            path: `${root.interfacePath}/uevent`;
             watchChanges: true;
-            onFileChanged: {
-                var textData = text();
-                console.log("uevent:", textData);
-            }
+            onFileChanged: this.reload();
         },
         FileView{
-            id: recivedBytesWatcher
-            path: `${root.interfacePath}/statistics/rx_bytes`
+            id: recivedBytesWatcher;
+            path: `${root.interfacePath}/statistics/rx_bytes`;
             watchChanges: false;
         },
         FileView{
-            id: transmittedBytesWatcher
-            path: `${root.interfacePath}/statistics/tx_bytes`
+            id: transmittedBytesWatcher;
+            path: `${root.interfacePath}/statistics/tx_bytes`;
             watchChanges: false;
         },
         Process{
-            id: proccessBytesRecived
+            id: proccessBytesRecived;
             running: false;
             onStarted: {
                 if(root.totalRecived != "0"){
@@ -105,7 +168,7 @@ QtObject{
                 recivedBytesWatcher.reload();
                 root.totalRecived = recivedBytesWatcher.text().trim();
             }
-            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/rx_bytes)-${root.totalPreviousRecived})/1024"`]
+            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/rx_bytes)-${root.totalPreviousRecived})/1024"`];
             stdout: SplitParser{ 
                 onRead: (data) => {
                     root.kiloBytesRecived = parseInt(data);
@@ -119,7 +182,7 @@ QtObject{
             }
         },
         Process{
-            id: proccessBytesTransmitted
+            id: proccessBytesTransmitted;
             running: false;
             onStarted: {
                 if(root.totalTransmitted != "0"){
@@ -128,7 +191,7 @@ QtObject{
                 recivedBytesWatcher.reload();
                 root.totalTransmitted = transmittedBytesWatcher.text().trim();
             }
-            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/tx_bytes)-${root.totalPreviousTransmitted})/1024"`]
+            command: ["sh", "-c", `bc <<< "($(cat ${root.interfacePath}/statistics/tx_bytes)-${root.totalPreviousTransmitted})/1024"`];
             stdout: SplitParser{ 
                 onRead: (data) => {
                     root.kiloBytesTransmitted = parseInt(data);
