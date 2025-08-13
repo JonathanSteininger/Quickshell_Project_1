@@ -227,5 +227,8 @@ QtObject{
     Component.onCompleted: {
         recivedBytesWatcher.reload();
         transmittedBytesWatcher.reload();
+        operstateFile.reload();
+        addressFile.reload();
+        ueventFile.reload();
     }
 }
