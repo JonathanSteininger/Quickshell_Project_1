@@ -42,7 +42,7 @@ CenterButtonStrip{
                 color: Colour.fg
                 anchors.horizontalCenter: parent.horizontalCenter;
                 horizontalAlignment: Text.AlignLeft;
-                text: GlobalState.activePlayerActual.trackTitle;
+                text: GlobalState.activePlayerActual.trackTitle || "Nothing Playing";
                 width: Math.min(implicitWidth, 600);
                 clip: true;
             }
