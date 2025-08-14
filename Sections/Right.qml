@@ -42,7 +42,7 @@ ButtonStrip{
                 Text{
                     id: uploadText;
                     anchors.left: parent.left;
-                    text: `${GlobalState.kiloBytesTransmittedTotal}kbps`;
+                    text: GlobalState.getNetworkingText(GlobalState.kiloBitsTransmittedTotal, true);
                     color: Colour.fg;
                     font.family: "Iosevka";
                     font.pointSize: 12;
@@ -64,7 +64,7 @@ ButtonStrip{
                 Text{
                     id: downloadText;
                     anchors.left: parent.left;
-                    text: `${GlobalState.kiloBytesRecivedTotal}kbps`;
+                    text: GlobalState.getNetworkingText(GlobalState.kiloBitsRecivedTotal, true);
                     color: Colour.fg;
                     font.family: "Iosevka";
                     font.pointSize: 12;

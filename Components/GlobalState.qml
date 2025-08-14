@@ -75,6 +75,30 @@ Singleton {
     readonly property list<QtObject> networkInterfaces: [];
     readonly property int kiloBytesRecivedTotal: networkInterfaces.reduce((acc, current) => acc += current.kiloBytesRecived, 0);
     readonly property int kiloBytesTransmittedTotal: networkInterfaces.reduce((acc, current) => acc += current.kiloBytesTransmitted, 0);
+    readonly property int kiloBitsRecivedTotal: kiloBytesRecivedTotal * 8;
+    readonly property int kiloBitsTransmittedTotal: kiloBytesTransmittedTotal * 8;
+
+    function getNetworkingText(value, isbits){
+        var endBit = "Bps";
+        if (isbits) {
+            endBit = "bps";
+        }
+        //Kbit
+        if (value < 1000){
+            return `${value}K${endBit}`;
+        }
+        //Mbit
+        if (value < 1000000){
+            return `${Math.round(value/1024)}M${endBit}`;
+        }
+        //Gbit
+        if (value < 1000000000){
+            return `${Math.round(value/(1024*1024))}G${endBit}`;
+        }
+        //Tbit
+        //this can overflow. scawy, but that would be crazy
+        return `${Math.round(value/(1024*1024*1024))}T${endBit}`;
+    }
 
     Timer{
         running: true;
