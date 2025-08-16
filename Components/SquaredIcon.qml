@@ -7,13 +7,14 @@ import QtQuick.Effects
 Item{
     id: root;
     property string icon: "";
+    property string iconRaw: `root:${icon}`;
     height: 32;
     width: height;
     property string iconColor: "white";
     IconImage{
         id:image;
         anchors.horizontalCenter: parent.horizontalCenter; 
-        source: `root:${parent.icon}`;
+        source: parent.iconRaw;
         backer.sourceSize: Qt.size(root.height*2,root.height*2);
         implicitSize: parent.height;
         visible: false;
