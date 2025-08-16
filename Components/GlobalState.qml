@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell 
 import QtQuick
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 import Quickshell.Services.Mpris
 import Quickshell.Services.SystemTray
 import qs.Components as Components
@@ -159,6 +160,7 @@ Singleton {
     property var blankTrayMenu: null;
     property var activeSysTrayMenu: null;
 
+
     //tracks default audio.
     readonly property PwNode defaultAudio: Pipewire.defaultAudioSink;
     readonly property PwNode defaultAudioSource: Pipewire.defaultAudioSource;
@@ -201,10 +203,6 @@ Singleton {
     readonly property int playerAmount: Mpris.players.values.length;
 
 
-    Component.onCompleted: {
-        Mpris.players.objectRemovedPost.connect(validatePlayerIndex);
-        Mpris.players.objectInsertedPost.connect(validatePlayerIndex);
-    }
 
     function validatePlayerIndex(object, index){
         if(activePlayer >= playerAmount){
@@ -234,6 +232,14 @@ Singleton {
         precision: SystemClock.Seconds;
     }
 
+    property QtObject battery: QtObject {
+        property UPowerDevice mainBattery: UPower.devices.values.find((device) => device.isLaptopBattery);
+        property string percentage: `${Math.round(mainBattery.percentage*1000)/10}%`;
+        onMainBatteryChanged: {
+            console.log(mainBattery.iconName, Quickshell.iconPath(mainBattery.iconName));
+        }
+    }
+
 
     //workaround for brightness controls. 
     //apple cinnema displays use usb bus.
@@ -243,4 +249,9 @@ Singleton {
     property var appleCinamaDisplays: [
         "/dev/usb/hiddev1"
     ]
+
+    Component.onCompleted: {
+        Mpris.players.objectRemovedPost.connect(validatePlayerIndex);
+        Mpris.players.objectInsertedPost.connect(validatePlayerIndex);
+    }
 }

@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
 import "../Components/"
+import Quickshell.Services.UPower
 
 ButtonStrip{
     id: rightPanel;
@@ -119,9 +120,9 @@ ButtonStrip{
                 }
             }
         },
-        RowLayout{
-            width: childrenRect.width;
-            height: childrenRect.height;
+        Item{
+            implicitWidth: 65;
+            implicitHeight: childrenRect.height;
             signal clicked();
             onClicked: () => {
                 GlobalState.popupRight("audio", rightPanel.convertPopoutPosition(x,width));
@@ -130,119 +131,56 @@ ButtonStrip{
             onWheel:(event) => {
                 GlobalState.defaultAudio.audio.volume += Math.round(event.angleDelta.y/360 * 0.1 * 1000)/1000;
             }
+            RowLayout{
+                anchors.centerIn: parent;
+                width: childrenRect.width;
+                height: childrenRect.height;
+                Text{
+                    id: volume
+                    horizontalAlignment: Text.AlignRight;
+                    property real volume: GlobalState.defaultAudio.audio.volume;
+                    text: `${Math.floor(this.volume*100)}%`;
+                    color: Colour.fg;
+                    font.family: "Iosevka";
+                    font.pointSize: 14;
+                }
+                SquaredIcon{
+                    icon: getIcon();
+                    height: 24;
+                    iconColor: Colour.fg;
+                    function getIcon(){
+                        if(GlobalState.defaultAudio == null){
+                            return Icons.volume_mute
+                        }
+                        var audio = GlobalState.defaultAudio.audio;
+                        if(audio.muted){
+                            return Icons.volume_mute;
+                        }
+                        if(audio.volume >= 0.7){
+                            return Icons.volume_high;
+                        }
+                        if(audio.volume < 0.7 && audio.volume >= 0.1){
+                            return Icons.volume_low;
+                        }
+                        return Icons.volume_x;
+                    }
+
+                }
+            }
+        },
+        Row{
+            spacing: 10;
             Text{
-                id: volume
-                horizontalAlignment: Text.AlignRight;
-                property real volume: GlobalState.defaultAudio.audio.volume;
-                Layout.preferredWidth: 40;
-                text: `${Math.floor(this.volume*100)}%`;
+                id: battery
+                text: GlobalState.battery.percentage;
                 color: Colour.fg;
                 font.family: "Iosevka";
                 font.pointSize: 14;
             }
             SquaredIcon{
-                icon: getIcon();
+                iconRaw: Quickshell.iconPath(GlobalState.battery.mainBattery.iconName);
                 height: 24;
                 iconColor: Colour.fg;
-                function getIcon(){
-                    if(GlobalState.defaultAudio == null){
-                        return Icons.volume_mute
-                    }
-                    var audio = GlobalState.defaultAudio.audio;
-                    if(audio.muted){
-                        return Icons.volume_mute;
-                    }
-                    if(audio.volume >= 0.7){
-                        return Icons.volume_high;
-                    }
-                    if(audio.volume < 0.7 && audio.volume >= 0.1){
-                        return Icons.volume_low;
-                    }
-                    return Icons.volume_x;
-                }
-
-            }
-        },
-        Text{
-            id: battery
-            text: "hello";
-            color: Colour.fg;
-            font.family: "Iosevka";
-            font.pointSize: 14;
-            Timer{
-                interval: 5000;
-                repeat: true;
-                running: true;
-                onTriggered: batteryProc.running = true;
-            }
-            Process{
-                id: batteryProc;
-                running: true;
-                command: ["sh", "-c", `bc <<< "scale=3;$(cat /sys/class/power_supply/BAT0/charge_now )/$(cat /sys/class/power_supply/BAT0/charge_full) * 100" | sed 's/..$//'`];
-
-                stdout: SplitParser{
-                    onRead: (data) => {
-                        battery.text = `${data}%`
-                    }
-                }
-
-                stderr: SplitParser{
-                    onRead: (data) => {
-                        console.log("Battery usage process failed. Removing Component because you prob have no battery... or some other error.");
-                        console.log("bat usage error:", data);
-                        battery.destroy();
-                    }
-                }
-                onExited: (exitCode, exitStatus) => {
-                    if(exitCode != 0){
-                        console.log("error code returned from battery usage process:", exitCode);
-                        battery.destroy();
-                    }
-                }
-            }
-        },
-        Text{
-            id: charging
-            text: "hello";
-            color: Colour.fg;
-            font.family: "Iosevka";
-            font.pointSize: 14;
-            Timer{
-                interval: 5000;
-                repeat: true;
-                running: true;
-                onTriggered: chargingProc.running = true;
-            }
-            Process{
-                id: chargingProc;
-                running: true;
-                command: ["sh", "-c", "acpi"];
-                stdout: SplitParser{
-                    onRead: data => {
-                        var _sections = data.split(" ");
-                        var output = "no battery?";
-                        for (var i = 0; i < _sections.length; i++){
-                            if (_sections[i].includes(":")){
-                                output = _sections[i];
-                            }
-                        }
-                        var time = output;
-                        charging.text = `${time}`;
-                    }
-                }
-                stderr: SplitParser{
-                    onRead: (data) => {
-                        console.log("battery remaining failed... or some other error.");
-                        console.log("battery remaining  error:", data);
-                        charging.destroy();
-                    }
-                }
-                onExited: (exitCode, exitStatus) => {
-                    if(exitCode != 0){
-                        console.log("error code returned from battery remaining process:", exitCode);
-                        charging.destroy();
-                    }
-                }
             }
         }
     ]
