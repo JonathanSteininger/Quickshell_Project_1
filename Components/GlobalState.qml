@@ -69,7 +69,8 @@ Singleton {
         "audio",
         "tray_menu",
         "brightness",
-        "network"
+        "network",
+        "battery"
     ]
 
 
@@ -236,7 +237,9 @@ Singleton {
         property UPowerDevice mainBattery: UPower.devices.values.find((device) => device.isLaptopBattery);
         property string percentage: `${Math.round(mainBattery.percentage*1000)/10}%`;
         onMainBatteryChanged: {
-            console.log(mainBattery.iconName, Quickshell.iconPath(mainBattery.iconName));
+            //console.log(mainBattery.iconName, Quickshell.iconPath(mainBattery.iconName));
+            console.log(device.state.toString(), device.energy, device.percentage);
+            console.log(UPowerDeviceState.PendingCharge,UPowerDeviceState.Charging,UPowerDeviceState.Discharging,UPowerDeviceState.Unknown,UPowerDeviceState.PendingDischarge,);
         }
     }
 

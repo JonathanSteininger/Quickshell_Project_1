@@ -170,6 +170,10 @@ ButtonStrip{
         },
         Row{
             spacing: 10;
+            signal clicked();
+            onClicked: () => {
+                GlobalState.popupRight("battery", rightPanel.convertPopoutPosition(x,width));
+            }
             Text{
                 id: battery
                 text: GlobalState.battery.percentage;

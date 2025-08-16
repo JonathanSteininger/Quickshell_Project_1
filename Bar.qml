@@ -107,5 +107,6 @@ Scope {
         }
         Panels.Brightness{}
         Panels.Network{}
+        Panels.Battery{}
     }
 }
