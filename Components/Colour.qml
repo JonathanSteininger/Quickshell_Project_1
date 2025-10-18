@@ -67,6 +67,9 @@ Singleton {
         path: `${Quickshell.env("HOME")}/.cache/wal/colors.json`;
         watchChanges: true;
         preload: true;
+        onFileChanged: {
+            reload();
+        }
         JsonAdapter{
             id: pywalJson;
             property string wallpaper: "/hyprdev/.config/hypr/backgrounds/fantasy-background.jpg";
