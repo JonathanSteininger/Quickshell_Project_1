@@ -11,6 +11,7 @@ pragma ComponentBehavior: Bound;
 
 Shape{
     id: root;
+    default property alias data: childContainer.children;
     property alias innerChildren: childContainer.children;
     property bool tiltRight: true;
     property string borderColor: "black";
@@ -134,6 +135,10 @@ Shape{
             id: lineSplitter;
             height: parent.height;
             x: root.innerChildren[index].x;
+            //this shit is probably borked because no binding is heppening to the actual child.
+            //so when stuff like applets load, they are overlapping with 0 px gaps
+            //thats why reloading works normally, because applets are already loaded!!!!
+            //same with mpris players
             readonly property real shift: height * root.tiltStrength;
             readonly property real shift1: root.tiltRight ? shift : 0;
             readonly property real shift2: root.tiltRight ? 0 : shift;

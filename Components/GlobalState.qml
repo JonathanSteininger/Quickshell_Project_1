@@ -32,7 +32,6 @@ Singleton {
 
 
 
-
     function popupMiddle(id: string, x: int): void{
         var lower = id.toLowerCase();
         middle = middleMap.findIndex((child) => child == lower);
