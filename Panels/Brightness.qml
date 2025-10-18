@@ -13,31 +13,6 @@ Rectangle{
     height: 80;
     color: Components.Colour.trans;
 
-    property var cinemaDisplays: [
-        {
-            path: "/dev/usb/hiddev1",
-            maxBrightness: 0,
-            brightness: 0,
-            errored: false
-        }
-    ]
-
-    /*
-     {
-         id: 0,
-         maxBrightness: 0,
-         brightness: 0,
-         brightnessID: -1,
-         errored: false
-     }
-     */
-    //ddcutil --display 0 
-    //setvcp <feature-code> arg
-    //getvcp <feature-code> 
-    //-t for brief output.
-    property var monitors: [
-    ]
-
     Components.Slider{
         barColor: Components.Colour.accent;
         backgroundColor: Components.Colour.trans;
