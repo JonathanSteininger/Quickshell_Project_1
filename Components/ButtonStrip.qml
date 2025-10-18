@@ -128,13 +128,14 @@ Shape{
         }
     }
     Repeater{
-        model: root.innerChildren.length;
+        model: ScriptModel {
+            values: root.innerChildren.filter((thing) => thing);
+        }
         Shape{
-            required property int index;
-            visible: index != 0;
+            required property var modelData;
             id: lineSplitter;
             height: parent.height;
-            x: root.innerChildren[index].x;
+            x: modelData.x;
             //this shit is probably borked because no binding is heppening to the actual child.
             //so when stuff like applets load, they are overlapping with 0 px gaps
             //thats why reloading works normally, because applets are already loaded!!!!
@@ -152,9 +153,24 @@ Shape{
                     y: lineSplitter.height;
                     x: lineSplitter.shift2;
                 }
+                function redraw(){
+                    startY++;
+                    startY--;
+                }
+                Component.onCompleted: {
+                    root.onRedraw.connect(redraw);
+                }
             }
         }
     }
+    //shitty ass fuck^2
+    onColorChanged:{
+        redraw();
+    }
+    onBorderColorChanged: {
+        redraw();
+    }
+    signal redraw();
 
     RowLayout{
         id: childContainer;

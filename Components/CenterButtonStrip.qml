@@ -13,8 +13,12 @@ Shape{
     id: root;
     property alias innerChildren: childContainer.children;
     property bool tiltRight: true;
-    property string borderColor: "black";
-    property string color: "white";
+    property color borderColor: Qt.color("black");
+    property color color: Qt.color("white");
+    onColorChanged: {
+        redraw();
+    }
+
     property real borderSize: 2;
     property real tiltStrength: 1;
 
@@ -39,8 +43,15 @@ Shape{
     readonly property real shift1: tiltRight ? shift : 0;
     readonly property real shift2: tiltRight ? 0 : shift;
 
+    //shity fucky asscheeks. shape does not redraw itself after bound color changes.
+    function redraw() {
+        bigPath.startX++;
+        bigPath.startX--;
+    }
+
 
     ShapePath{
+        id: bigPath;
         strokeWidth: root.borderSize;
         strokeColor: root.borderColor;
         fillColor: root.color;

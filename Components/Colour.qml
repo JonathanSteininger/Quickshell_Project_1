@@ -55,14 +55,18 @@ Singleton {
     property color active_trans: Qt.alpha(active, opacity);
     property color trueBorder_trans: Qt.alpha(trueBorder, opacity);
     */
+   Timer{ 
+       id: firstLoadReload;
+       running: false;
+       repeat: false;
+       interval: 100;
+       onTriggered: Quickshell.reload(false);
+   }
     FileView{
         id: fileViewer;
         path: `${Quickshell.env("HOME")}/.cache/wal/colors.json`;
         watchChanges: true;
-        onFileChanged: () => {
-            console.log("changed colors");
-            reload();
-        }
+        preload: true;
         JsonAdapter{
             id: pywalJson;
             property string wallpaper: "/hyprdev/.config/hypr/backgrounds/fantasy-background.jpg";
