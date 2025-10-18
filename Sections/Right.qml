@@ -186,6 +186,12 @@ ButtonStrip{
                 height: 24;
                 iconColor: Colour.fg;
             }
+            /*
+            IconImage{
+                source: Quickshell.iconPath(GlobalState.battery.mainBattery.iconName);
+                implicitSize: 24;
+            }
+             */
         }
     ]
 }
