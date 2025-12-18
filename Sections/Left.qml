@@ -42,12 +42,13 @@ ButtonStrip{
             Text{
                 anchors.centerIn: parent;
                 text: parent.modelData.name;
-                color: Colour.fg;
+                color: parent.modelData.active ? Colour._active : Colour.fg;
                 font.family: "Iosevka";
                 font.pointSize: 14;
             }
             signal clicked();
-            onClicked: modelData.activate();
+            //onClicked: modelData.activate();
+            onClicked: Hyprland.dispatch(`workspace ${modelData.id}`);
         }
     }
 }
