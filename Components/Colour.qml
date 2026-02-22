@@ -33,7 +33,7 @@ Singleton {
     property color accent: pywalJson.colors.color2;
     property color accent_dark: accent.darker(2);
     property color selectedDark: _active.darker(2);
-    property color _active2: "red";
+    property color _active2: _active;
     property color _active3: pywalJson.colors.color3;
 
     /*
