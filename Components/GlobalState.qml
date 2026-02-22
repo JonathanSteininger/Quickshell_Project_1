@@ -113,36 +113,91 @@ Singleton {
         networkInterfaces.forEach((netInt) => netInt.updateRate = networkUpdateRate);
     }
 
-    property list<string> updatedPaths;
+    property list<string> networkIntPaths;
+    property list<string> backlightPaths;
 
     function clearNetworkPaths(){
-        updatedPaths = updatedPaths.filter(() => false);
+        networkIntPaths = networkIntPaths.filter(() => false);
     }
 
     readonly property var netIntComponent: Qt.createComponent("NetworkInteface.qml");
+    readonly property var brightnessDeviceComponent: Qt.createComponent("BrightnessDevice.qml");
+
+    function updateBrightnessDevices(){
+
+    }
 
     function updateNetworkInterfaces(){
         if(netIntComponent.status != Component.Ready){
             console.error("NetworkInterface is not ready:", netIntComponent.status);
             console.error("Null:", Component.Null, "Ready:", Component.Ready, "Loading:", Component.Loading, "Error:", Component.Error);
+            if (netIntComponent.status == Component.Error) {
+                console.error(netIntComponent.errorString());
+            }
             return
         }
-        var removableInterfaces = networkInterfaces.filter((face) => !updatedPaths.some((path) => path == face.interfacePath));
+        var removableInterfaces = networkInterfaces.filter((face) => !networkIntPaths.some((path) => path == face.interfacePath));
         if(removableInterfaces.length != 0){
             //removes gonna be null values.
-            networkInterfaces = networkInterfaces.filter((face) => updatedPaths.some((path) => path == face.interfacePath));;
+            networkInterfaces = networkInterfaces.filter((face) => networkIntPaths.some((path) => path == face.interfacePath));;
             removableInterfaces.forEach((removableThing) => {
                 console.log("destroying:", removableThing.interfacePath);
                 removableThing.destroy()
             });
         }
-        var missingPaths = updatedPaths.filter((path) => !networkInterfaces.some((face) => face.interfacePath == path));
+        var missingPaths = networkIntPaths.filter((path) => !networkInterfaces.some((face) => face.interfacePath == path));
         missingPaths.forEach((path) => {
             console.log("creating: ", path);
             networkInterfaces.push(netIntComponent.createObject(null, {interfacePath: path, updateRate: networkUpdateRate}))
         });
     }
 
+    
+
+    property list<QtObject> brigthnessDevices: [];
+    function clearBacklightPaths(){
+        backlightPaths = backlightPaths.filter(() => false);
+    }
+
+    function updateBacklights() {
+        console.log("updateing backlights");
+        if(brightnessDeviceComponent.status != Component.Ready){
+            console.error("brightness component is not ready:", brightnessDeviceComponent.status);
+            console.error("Null:", Component.Null, "Ready:", Component.Ready, "Loading:", Component.Loading, "Error:", Component.Error);
+            if (brightnessDeviceComponent.status == Component.Error) {
+                console.error(brightnessDeviceComponent.errorString());
+            }
+            return
+        }
+        var removable = brigthnessDevices.filter((face) => !backlightPaths.some((path) => path == face.backlightPath));
+        if(removable.length != 0){
+            //removes gonna be null values.
+            brigthnessDevices = brigthnessDevices.filter((face) => backlightPaths.some((path) => path == face.backlightPath));;
+            removable.forEach((removableThing) => {
+                console.log("destroying:", removableThing.backlightPath);
+                removableThing.destroy()
+            });
+        }
+        var missingPaths = backlightPaths.filter((path) => !brigthnessDevices.some((face) => face.backlightPath == path));
+        missingPaths.forEach((path) => {
+            console.log("creating: ", path);
+            brigthnessDevices.push(brightnessDeviceComponent.createObject(null, {backlightPath: path, min_brightness: 1}))
+        });
+    }
+
+    Process{
+        id: proccessBacklights;
+        command: ["find", "/sys/class/backlight", "-maxdepth", "1", "-mindepth", "1"];
+        running: true;
+        onStarted: root.clearBacklightPaths();
+        onExited: root.updateBacklights();
+        stdout: SplitParser{
+            onRead: (data) => {
+                console.log("adding backlight path:", data);
+                root.backlightPaths.push(data);
+            }
+        }
+    }
     Process{
         id: proccessNetworkInterfaces;
         command: ["find", "/sys/class/net", "-maxdepth", "1", "-mindepth", "1"];
@@ -151,7 +206,7 @@ Singleton {
         onExited: root.updateNetworkInterfaces();
         stdout: SplitParser{
             onRead: (data) => {
-                root.updatedPaths.push(data);
+                root.networkIntPaths.push(data);
             }
         }
     }
@@ -237,7 +292,6 @@ Singleton {
         property string percentage: `${Math.round(mainBattery.percentage*1000)/10}%`;
         onMainBatteryChanged: {
             //console.log(mainBattery.iconName, Quickshell.iconPath(mainBattery.iconName));
-            console.log(device.state.toString(), device.energy, device.percentage);
             console.log(UPowerDeviceState.PendingCharge,UPowerDeviceState.Charging,UPowerDeviceState.Discharging,UPowerDeviceState.Unknown,UPowerDeviceState.PendingDischarge,);
         }
     }
